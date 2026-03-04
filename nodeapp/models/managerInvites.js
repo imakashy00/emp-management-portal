@@ -20,8 +20,6 @@ const managerInviteSchema = new mongoose.Schema({
         default: Date.now,
         index: { expires: '24h' }
     }
-}, {
-    timestamps: true
-});
+})
 
 module.exports = mongoose.model('ManagerInvite', managerInviteSchema);

@@ -1,17 +1,18 @@
 const express = require('express');
-const { getUserByEmailAndPassword, getAllEmployees, addUser } = require('../controllers/userController');
+const { getUserByEmailAndPassword, getAllEmployees, addUser,inviteManager, verifyManager } = require('../controllers/userController');
 
 const router = express.Router();
 
-router.post('/login', getUserByEmailAndPassword);
 
 router.post('/signup', addUser);
 
+router.post('/login', getUserByEmailAndPassword);
+
 router.get('/getAllEmployees', getAllEmployees);
 
-// router.post('/inviteManager', controller.inviteManager);
+router.post('/inviteManager', inviteManager);
 
-// router.post('/verifyManager', controller.verifyManager);
+router.post('/verifyManager', verifyManager);
 
 
 module.exports = router
