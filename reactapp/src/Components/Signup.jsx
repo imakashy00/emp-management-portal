@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 const Signup = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    userName: '', email: '', mobile: '', password: '', confirmPassword: '', role: ''
+    userName: '', email: '', mobile: '', password: '', confirmPassword: ''
   });
   const [errors, setErrors] = useState({});
 
@@ -15,7 +15,6 @@ const Signup = () => {
     if (!formData.mobile) tempErrors.mobile = "Mobile is required";
     if (formData.password.length < 6) tempErrors.password = "Min 6 characters required";
     if (formData.password !== formData.confirmPassword) tempErrors.confirmPassword = "Passwords match error";
-    if (!formData.role) tempErrors.role = "Role is required";
     
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
@@ -95,19 +94,6 @@ const Signup = () => {
                 onChange={(e)=>setFormData({...formData, confirmPassword:e.target.value})} 
               />
               {errors.confirmPassword && <p className="text-[#CC0000] text-[11px] mt-1 font-medium">{errors.confirmPassword}</p>}
-            </div>
-
-            <div className="group">
-              <label className="text-[11px] text-gray-400 font-bold uppercase tracking-wider block">Role *</label>
-              <select 
-                className="w-full py-2 border-b-2 border-gray-200 outline-none focus:border-[#3C78D8] transition-colors text-sm bg-transparent"
-                onChange={(e)=>setFormData({...formData, role:e.target.value})}
-              >
-                <option value="">Select Role</option>
-                <option value="Employee">Employee</option>
-                <option value="Manager">Manager</option>
-              </select>
-              {errors.role && <p className="text-[#CC0000] text-[11px] mt-1 font-medium">{errors.role}</p>}
             </div>
 
             <button 
