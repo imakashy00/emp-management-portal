@@ -1,0 +1,27 @@
+const mongoose = require('mongoose');
+
+const managerInviteSchema = new mongoose.Schema({
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true
+    },
+    token: {
+        type: String,
+        required: true
+    },
+    invitedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+        index: { expires: '24h' }
+    }
+}, {
+    timestamps: true
+});
+
+module.exports = mongoose.model('ManagerInvite', managerInviteSchema);
