@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const leaveRequest = require('../controllers/leaveController');
-const { generateToken, verifyJWT } = require('../middleware/authMiddleware');
+const { generateToken, verifyJWT } = require('../middleware/auth');
 
-router.use(protect);
+router.use(generateToken);
 
 // Shared View Routes
 router.get('/', leaveRequest.viewLeaves);
