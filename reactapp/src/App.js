@@ -25,7 +25,7 @@ function App() {
       {/* Minimal layout routes to make navigation coherent with tests */}
       <Routes>
         {/* Public pages */}
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/error" element={<ErrorPage />} />
