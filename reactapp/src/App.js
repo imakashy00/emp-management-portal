@@ -18,6 +18,7 @@ import WfhForm from './EmployeeComponents/WfhForm';
 import ManagerNavbar from './ManagerComponents/ManagerNavbar';
 import LeaveRequest from './ManagerComponents/LeaveRequest';
 import WfhRequest from './ManagerComponents/WfhRequest';
+import RegisterManager from './ManagerComponents/RegisterManager';
 
 function App() {
   return (
@@ -119,6 +120,16 @@ function App() {
               <div style={{ marginTop: 16 }}>
                 <WfhRequest />
               </div>
+            </div>
+          }
+        />
+        <Route
+          path="/register-manager"
+          element={
+            <div>
+              
+                <RegisterManager />
+              
             </div>
           }
         />
