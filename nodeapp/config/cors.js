@@ -1,5 +1,5 @@
 const corsOptions = {
-    origin: process.env.ORIGIN,
+    origin: 'https://8081-ecdceceebbabefefcfccffeabf.premiumproject.examly.io',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
