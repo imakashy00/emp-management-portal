@@ -26,6 +26,7 @@ const Signup = () => {
       try {
         const { confirmPassword, ...submitData } = formData;
         // Logic: Using the SIGNUP key from config
+        console.log(API.SIGNUP)
         await axios.post(API.SIGNUP, submitData);
         alert("User Registration Successful!");
         navigate('/login');
