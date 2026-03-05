@@ -106,6 +106,8 @@ const Login = () => {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('userRole', response.data.role);
       localStorage.setItem('userId', response.data.id);
+      localStorage.setItem('userName', response.data.userName);
+
 
       toast.success("Login Successful! Welcome Back!!"); 
 
