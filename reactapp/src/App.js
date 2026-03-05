@@ -1,212 +1,61 @@
-// import React from 'react';
-// import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-
-// // Components
-// import HomePage from './Components/HomePage';
-// import Login from './Components/Login';
-// import Signup from './Components/Signup';
-// import ErrorPage from './Components/ErrorPage';
-
-// // Employee
-// import EmployeeNavbar from './EmployeeComponents/EmployeeNavbar';
-// import LeaveForm from './EmployeeComponents/LeaveForm';
-// import ViewLeave from './EmployeeComponents/ViewLeave';
-// import ViewWfh from './EmployeeComponents/ViewWfh';
-// import WfhForm from './EmployeeComponents/WfhForm';
-
-// // Manager
-// import ManagerNavbar from './ManagerComponents/ManagerNavbar';
-// import LeaveRequest from './ManagerComponents/LeaveRequest';
-// import WfhRequest from './ManagerComponents/WfhRequest';
-// import RegisterManager from './ManagerComponents/RegisterManager';
-
-// function App() {
-//   return (
-//     <Router>
-//       {/* Minimal layout routes to make navigation coherent with tests */}
-//       <Routes>
-//         {/* Public pages */}
-//         <Route path="/" element={<Login />} />
-//         <Route path="/home" element={<HomePage />} />
-//         <Route path="/login" element={<Login />} />
-//         <Route path="/signup" element={<Signup />} />
-//         <Route path="/error" element={<ErrorPage />} />
-
-//         {/* Employee area */}
-//         <Route
-//           path="/employee"
-//           element={
-//             <div>
-//               <EmployeeNavbar />
-//               <div style={{ marginTop: 16 }}>
-//                 <HomePage />
-//               </div>
-//             </div>
-//           }
-//         />
-//         <Route
-//           path="/leave"
-//           element={
-//             <div>
-//               <EmployeeNavbar />
-//               <div style={{ marginTop: 16 }}>
-//                 <LeaveForm />
-//               </div>
-//             </div>
-//           }
-//         />
-//         <Route
-//           path="/wfh"
-//           element={
-//             <div>
-//               <EmployeeNavbar />
-//               <div style={{ marginTop: 16 }}>
-//                 <WfhForm />
-//               </div>
-//             </div>
-//           }
-//         />
-//         <Route
-//           path="/view-leave"
-//           element={
-//             <div>
-//               <EmployeeNavbar />
-//               <div style={{ marginTop: 16 }}>
-//                 <ViewLeave />
-//               </div>
-//             </div>
-//           }
-//         />
-//         <Route
-//           path="/view-wfh"
-//           element={
-//             <div>
-//               <EmployeeNavbar />
-//               <div style={{ marginTop: 16 }}>
-//                 <ViewWfh />
-//               </div>
-//             </div>
-//           }
-//         />
-
-//         {/* Manager area */}
-//         <Route
-//           path="/manager"
-//           element={
-//             <div>
-//               <ManagerNavbar />
-//               <div style={{ marginTop: 16 }}>
-//                 <HomePage />
-//               </div>
-//             </div>
-//           }
-//         />
-//         <Route
-//           path="/leave-requests"
-//           element={
-//             <div>
-//               <ManagerNavbar />
-//               <div style={{ marginTop: 16 }}>
-//                 <LeaveRequest />
-//               </div>
-//             </div>
-//           }
-//         />
-//         <Route
-//           path="/wfh-requests"
-//           element={
-//             <div>
-//               <ManagerNavbar />
-//               <div style={{ marginTop: 16 }}>
-//                 <WfhRequest />
-//               </div>
-//             </div>
-//           }
-//         />
-//         <Route
-//           path="/register-manager"
-//           element={
-//             <div>
-
-//                 <RegisterManager />
-
-//             </div>
-//           }
-//         />
-
-//         {/* Fallback */}
-//         <Route path="*" element={<Navigate to="/error" replace />} />
-//       </Routes>
-//     </Router>
-//   );
-// }
-
-// export default App;
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// Components
+// 1. Core Components
 import HomePage from './Components/HomePage';
 import Login from './Components/Login';
 import Signup from './Components/Signup';
+import ForgotPassword from './Components/ForgotPassword';
 import ErrorPage from './Components/ErrorPage';
 
-
-// Employee
+// 2. Employee Specific Components
 import EmployeeNavbar from './EmployeeComponents/EmployeeNavbar';
 import LeaveForm from './EmployeeComponents/LeaveForm';
 import ViewLeave from './EmployeeComponents/ViewLeave';
 import ViewWfh from './EmployeeComponents/ViewWfh';
 import WfhForm from './EmployeeComponents/WfhForm';
 
-// Manager
+// 3. Manager Specific Components
 import ManagerNavbar from './ManagerComponents/ManagerNavbar';
+import EmployeeList from './ManagerComponents/EmployeeList';
 import LeaveRequest from './ManagerComponents/LeaveRequest';
 import WfhRequest from './ManagerComponents/WfhRequest';
 import RegisterManager from './ManagerComponents/RegisterManager';
-import Dashboard from './Components/Dashboard';
-import ForgotPassword from './Components/ForgotPassword';
 
 // ---------------------------------------------------------
-// 1. Protected Route Wrapper
+// 1. Protected Route Wrapper (Handles Security & Roles)
 // ---------------------------------------------------------
-const ProtectedRoute = ({ children, allowedRoles, applyMargin = true }) => {
-  // Fetch exactly "userRole" from local storage
-  const role = localStorage.getItem("userRole");
+const ProtectedRoute = ({ children, allowedRoles }) => {
+  const role = localStorage.getItem("userRole")?.toLowerCase();
 
-  // If user is not logged in, send them to login
   if (!role) {
     return <Navigate to="/login" replace />;
   }
 
-  // If user is logged in but role doesn't match the allowed roles, send to error page
   if (!allowedRoles.includes(role)) {
     return <Navigate to="/error" replace />;
   }
 
-  // Return children wrapped with the margin styling (unless explicitly disabled)
-  return applyMargin ? <div style={{ marginTop: 16 }}>{children}</div> : children;
+  return children;
 };
 
 // ---------------------------------------------------------
-// 2. Dynamic Navigation Component
+// 2. Dynamic Navigation Component (Conditional Top Navbar)
 // ---------------------------------------------------------
 function Navigation() {
   const location = useLocation();
-  // Fetch exactly "userRole" from local storage
-  const role = localStorage.getItem("userRole");
+  const role = localStorage.getItem("userRole")?.toLowerCase();
 
   // Paths where the Navbar should NOT be displayed
-  const noNavPaths =['/', '/login', '/signup', '/error', '/home', '/register-manager'];
+  const noNavPaths = ['/', '/login', '/signup', '/error', '/forgot-password'];
   
   if (noNavPaths.includes(location.pathname)) {
     return null; 
   }
 
-  // Render the respective navbar based on the userRole
+  // Show correct navbar based on role from localStorage
   if (role === "manager") return <ManagerNavbar />;
   if (role === "employee") return <EmployeeNavbar />;
 
@@ -218,78 +67,75 @@ function Navigation() {
 // ---------------------------------------------------------
 function App() {
   return (
-    
     <Router>
-      <Navigation/>
-       <>
-      <ToastContainer position="top-right" autoClose={3000} />
-     
-    
-      {/* Minimal layout routes to make navigation coherent with tests */}
+      {/* Persists the correct navbar at the top of every protected page */}
+      <Navigation />
+      
+      {/* Toast notifications container */}
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
+
       <Routes>
-        {/* PUBLIC ROUTES */}
-        <Route path="/" element={<Login />} />
-        <Route path="/home" element={<Dashboard />} />
+        {/* --- PUBLIC ROUTES --- */}
+        <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/error" element={<ErrorPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/error" element={<ErrorPage />} />
 
-        {/* EMPLOYEE PROTECTED ROUTES */}
-        <Route path="/employee" element={
-          <ProtectedRoute allowedRoles={["employee"]}>
+        {/* --- SHARED PROTECTED ROUTES --- */}
+        <Route path="/home" element={
+          <ProtectedRoute allowedRoles={["employee", "manager"]}>
             <HomePage />
           </ProtectedRoute>
         } />
-        <Route path="/leave" element={
-          <ProtectedRoute allowedRoles={["employee"]}>
-            <LeaveForm />
-          </ProtectedRoute>
-        } />
-        <Route path="/wfh" element={
+
+        {/* --- EMPLOYEE PROTECTED ROUTES (Ref: PDF Page 3) --- */}
+        <Route path="/apply-wfh" element={
           <ProtectedRoute allowedRoles={["employee"]}>
             <WfhForm />
           </ProtectedRoute>
         } />
-        <Route path="/view-leave" element={
-          <ProtectedRoute allowedRoles={["employee"]}>
-            <ViewLeave />
-          </ProtectedRoute>
-        } />
-        <Route path="/view-wfh" element={
+        <Route path="/wfh-history" element={
           <ProtectedRoute allowedRoles={["employee"]}>
             <ViewWfh />
           </ProtectedRoute>
         } />
+        <Route path="/apply-leave" element={
+          <ProtectedRoute allowedRoles={["employee"]}>
+            <LeaveForm />
+          </ProtectedRoute>
+        } />
+        <Route path="/leave-history" element={
+          <ProtectedRoute allowedRoles={["employee"]}>
+            <ViewLeave />
+          </ProtectedRoute>
+        } />
 
-        {/* MANAGER PROTECTED ROUTES */}
-        <Route path="/manager" element={
+        {/* --- MANAGER PROTECTED ROUTES (Ref: PDF Page 3) --- */}
+        <Route path="/employees" element={
           <ProtectedRoute allowedRoles={["manager"]}>
-            <HomePage />
+            <EmployeeList />
           </ProtectedRoute>
         } />
-        <Route path="/leave-requests" element={
-          <ProtectedRoute allowedRoles={["manager"]}>
-            <LeaveRequest />
-          </ProtectedRoute>
-        } />
-        <Route path="/wfh-requests" element={
+        <Route path="/manager/wfh" element={
           <ProtectedRoute allowedRoles={["manager"]}>
             <WfhRequest />
           </ProtectedRoute>
         } />
-        
-        {/* Register Manager: we set applyMargin={false} to keep it exactly like your original code */}
-        <Route path="/register-manager" element={
-          <ProtectedRoute allowedRoles={["manager"]} applyMargin={false}>
-            <Signup/>
+        <Route path="/manager/leave" element={
+          <ProtectedRoute allowedRoles={["manager"]}>
+            <LeaveRequest />
+          </ProtectedRoute>
+        } />
+        <Route path="/invite-manager" element={ // NEW: Custom Option added
+          <ProtectedRoute allowedRoles={["manager"]}>
+            <RegisterManager />
           </ProtectedRoute>
         } />
 
-        {/* FALLBACK ROUTE */}
+        {/* --- FALLBACK ROUTE --- */}
         <Route path="*" element={<Navigate to="/error" replace />} />
       </Routes>
-      </>
     </Router>
   );
 }
