@@ -1,15 +1,11 @@
+// Dashboard.jsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Outlet, useLocation } from 'react-router-dom';
-
-import Sidebar from './NewComponents/SideBarTemp/Sidebar.jsx'; 
-import Header from './NewComponents/Header/Header.jsx';
-import Home from './Home.jsx';
+import { useNavigate, Outlet } from 'react-router-dom';
+import Sidebar from './NewComponents/SideBarTemp/Sidebar.jsx';
 import AppFooter from './NewComponents/Footer/AppFooter.jsx';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-
   const [role, setRole] = useState('');
   const [userName, setUserName] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -31,15 +27,15 @@ const Dashboard = () => {
     navigate('/login', { replace: true });
   };
 
-  const isManager = role === 'Manager' || role === 'manager';
-  const isHomeRoute = location.pathname === '/' || location.pathname === '/home';
+  const isManager = role?.toLowerCase() === 'manager';
 
   return (
-    <div className="flex h-screen bg-[#f4f7f6] font-['Segoe_UI',sans-serif]">
-      {/* Sidebar */}
+    <div className="flex h-screen bg-[var(--bg-light)] overflow-hidden">
       <Sidebar
         isOpen={isMobileMenuOpen}
         isManager={isManager}
+        userName={userName}
+        role={role}
         onNavigate={(path) => {
           navigate(path);
           setIsMobileMenuOpen(false);
@@ -47,16 +43,13 @@ const Dashboard = () => {
         onLogout={handleLogout}
       />
 
-      {/* Main content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <Header
-          onToggleMenu={() => setIsMobileMenuOpen((s) => !s)}
-          userName={userName}
-          role={role}
-        />
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
-        <div className="flex-1 overflow-y-auto p-6 md:p-12">
-          {isHomeRoute ? <Home userName={userName} /> : <Outlet />}
+        <div className="flex-1 overflow-y-auto p-4 md:px-10 md:py-8 custom-scrollbar">
+          {/* Outlet is where WfhForm, LeaveForm, etc., will be rendered */}
+          <div className="min-h-[calc(100vh-180px)]">
+            <Outlet context={{ userName, role }} />
+          </div>
           <AppFooter />
         </div>
       </main>

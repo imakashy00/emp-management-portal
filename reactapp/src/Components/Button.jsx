@@ -7,3 +7,4 @@ const Button = ({ children, loading, ...props }) => (
         {loading ? "Processing..." : children}
     </button>
 );
+export default Button

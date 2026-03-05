@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useSignup } from './hooks/useSignup';
-import Input from './components/common/Input';
-import Button from './components/common/Button';
-import {Eye, EyeOff} from 'lucide-react'
+import { useSignup } from '../hooks/useSignup';
+import Input from './Input';
+import Button from './Button';
+import { Eye, EyeOff } from 'lucide-react'
 
 
 const Signup = () => {
@@ -73,7 +73,7 @@ const Signup = () => {
                 type={showPassword ? "text" : "password"}
                 required
                 error={errors.password}
-                icon={showPassword ? <Eye /> : <EyeOff />}
+                icon={showPassword ? Eye : EyeOff}
                 onIconClick={() => setShowPassword(!showPassword)}
                 onChange={handleInputChange}
               />
@@ -84,7 +84,7 @@ const Signup = () => {
                 type={showConfirm ? "text" : "password"}
                 required
                 error={errors.confirmPassword}
-                icon={showConfirm ? EyeClosed : EyeOpen}
+                icon={showConfirm ? Eye : EyeOff}
                 onIconClick={() => setShowConfirm(!showConfirm)}
                 onChange={handleInputChange}
               />
