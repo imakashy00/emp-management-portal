@@ -28,7 +28,7 @@ const seedFirstManager = async () => {
 
         await firstManager.save();
         console.log("First Manager created successfully!");
-        console.log("Email: admin@company.com | Password: #123@Admin");
+        console.log("Email: admin@workbuddy.com | Password: #123@Admin");
 
         process.exit();
     } catch (error) {
