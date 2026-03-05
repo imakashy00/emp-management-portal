@@ -3,7 +3,7 @@ const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const sendManagerInvite = async (email, token) => {
-    const inviteLink = `https://8080-aedeaaabddddefefcfccffeabf.premiumproject.examly.io/register-manager?token=${token}&email=${email}`;
+    const inviteLink = `https://8080-ecdceceebbabefefcfccffeabf.premiumproject.examly.io/register-manager?token=${token}&email=${email}`;
 
     const msg = {
         to: email,
