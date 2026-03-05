@@ -7,6 +7,8 @@ const userRouter = require('./routers/userRouter');
 const app = express();
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger'); 
+const leaveRequest=require('./routers/leaveRequestRouter')
+const wfhRequest=require('./routers/wfhRequestRouter')
 
 // const PORT = process.env.PORT || 8080;
 const PORT = 8080;
@@ -24,6 +26,8 @@ app.get('/', (req, res) => {
     res.status(200).json({ status: 'ok', uptime: process.uptime() });
 });
 app.use('/api/users',userRouter);
+app.use('/api/leaveRequests',leaveRequest)
+app.use('/api/wfhRequest',wfhRequest)
 
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);

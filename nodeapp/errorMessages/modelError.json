@@ -1,0 +1,70 @@
+{
+    "user": {
+      "username": {
+        "required": "Username is required.",
+        "unique": "This username is already taken.",
+        "minLength": "Username must be at least 3 characters long."
+      },
+      "email": {
+        "required": "Email address is required.",
+        "unique": "This email is already registered.",
+        "invalid": "Please provide a valid email address."
+      },
+      "password": {
+        "required": "Password is required.",
+        "minLength": "Password must be at least 8 characters long."
+      },
+      "mobile": {
+        "required": "Mobile number is required.",
+        "unique": "This mobile number is already in use.",
+        "invalid": "Please provide a valid 10-digit mobile number."
+      }
+    },
+    "leaveRequest": {
+      "startDate": "Start date is required.",
+      "endDate": "End date is required.",
+      "reason": "Reason for leave is required.",
+      "leaveType": "Leave type is required."
+    },
+    "leave": {
+      "employeeId": "Employee reference is required.",
+      "startDate": {
+        "required": "Start date is required.",
+        "invalid": "Start date must be a valid date."
+      },
+      "endDate": {
+        "required": "End date is required.",
+        "invalid": "End date cannot be before the start date."
+      },
+      "reason": {
+        "required": "Please provide a reason for your leave.",
+        "minLength": "Reason should be at least 10 characters long."
+      },
+      "leaveType": {
+        "required": "Leave type is required.",
+        "enum": "Invalid leave type. Choose from: sick, vacation, casual, or other."
+      },
+      "status": {
+        "enum": "Status must be either Pending, Approved, or Rejected."
+      }
+
+  },
+  "wfh": {
+    "employeeId": "Employee reference is required.",
+    "startDate": {
+      "required": "WFH start date is required.",
+      "invalid": "Start date must be a valid date."
+    },
+    "endDate": {
+      "required": "WFH end date is required.",
+      "invalid": "End date cannot be before the start date."
+    },
+    "reason": {
+      "required": "Please provide a reason for WFH.",
+      "minLength": "Reason should be at least 10 characters long."
+    },
+    "status": {
+      "enum": "Status must be either Pending, Approved, or Rejected."
+    }
+  }
+}

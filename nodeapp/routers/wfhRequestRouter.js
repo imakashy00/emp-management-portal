@@ -1,21 +1,33 @@
 const express = require('express');
 const router = express.Router();
-const workFromhome = require('../controllers/wfhController');
-const { generateToken, verifyJWT } = require('../middleware/auth');
+const wfhController = require('../controllers/wfhRequestController');
+const { verifyJWT } = require('../middleware/auth');
+const messages = require('../errorMessages/controllerError.json');
 
-// All routes require login
-router.use(generateToken);
+// Helper for RBAC
+const restrictTo = (role) => {
+    console.log(role)
+    return (req, res, next) => {
+        if (req.body.role === role) {
+            return res.status(403).json({ message: messages.auth.forbidden });
+        }
+        next();
+    };
+};
 
-// View Requests (Shared - Manager views list, Employee views personal)
-router.get('/', workFromhome.viewWfhRequests);
-router.get('/:id', workFromhome.getWfhRequestById);
+// All WFH routes require valid login
+router.use(verifyJWT);
+
+// Shared View Routes
+router.get('/', wfhController.viewWfhRequests);
+router.get('/:id', wfhController.getWfhRequestById);
 
 // Employee Only: Create, Edit, Delete
-router.post('/', verifyJWT('employee'), workFromhome.addWfhRequest);
-router.put('/:id', verifyJWT('employee'), workFromhome.updateWfhRequest);
-router.delete('/:id', verifyJWT('employee'), workFromhome.deleteWfhRequest);
+router.post('/', restrictTo('employee'), wfhController.addWfhRequest);
+router.put('/:id', restrictTo('employee'), wfhController.updateWfhRequest);
+router.delete('/:id', restrictTo('employee'), wfhController.deleteWfhRequest);
 
 // Manager Only: Change Status
-router.patch('/:id/status', verifyJWT('manager'), workFromhome.changeWfhStatus);
+router.patch('/:id/status', restrictTo('manager'), wfhController.changeWfhStatus);
 
 module.exports = router;

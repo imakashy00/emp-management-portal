@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const ManagerInvites = require('../models/managerInvites'); // Use one consistent import
 const { generateToken } = require('../middleware/auth');
 const sendManagerInvite = require('../services/sendMail');
+const messages = require('../errorMessages/controllerError.json')
 
 /**
  * LOGIN: Find by email, then compare plaintext password using bcrypt.compare
@@ -13,17 +14,16 @@ const sendManagerInvite = require('../services/sendMail');
 const getUserByEmailAndPassword = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     // Find by email only
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: 'Invalid email or password' });
+      return res.status(404).json({ message: messages.auth.invalid });
     }
 
     // Compare plaintext with the stored bcrypt hash
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: messages.auth.invalid });
     }
 
     // Generate JWT
@@ -38,7 +38,7 @@ const getUserByEmailAndPassword = async (req, res) => {
     });
   } catch (error) {
     console.log(error.message);
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message || messages.common.serverError });
   }
 };
 
@@ -54,7 +54,7 @@ const addUser = async (req, res) => {
     // (Optional but recommended) prevent duplicate emails
     const existing = await User.findOne({ email });
     if (existing) {
-      return res.status(409).json({ message: 'Email already registered' });
+      return res.status(409).json({ message: messages.user.exists });
     }
 
     // Hash password with 10 salt rounds
@@ -70,18 +70,14 @@ const addUser = async (req, res) => {
     });
 
     // Return safe user (no password)
-    const safeUser = {
-      _id: user._id,
-      userName: user.userName,
-      email: user.email,
-      mobile: user.mobile,
-      role: user.role
-    };
-
-    return res.status(200).json({ message: 'User added Successfully', user: safeUser });
+   
+    return res.status(200).json({
+      message: messages.user.addSuccess,
+    
+    });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message || messages.common.serverError });
   }
 };
 
@@ -95,7 +91,7 @@ const getAllEmployees = async (req, res) => {
     return res.status(200).json(employees);
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: messages.user.fetchError});
   }
 };
 
@@ -117,10 +113,10 @@ const inviteManager = async (req, res) => {
     // Send the email via SendGrid
     await sendManagerInvite(email, token);
 
-    return res.status(200).json({ message: 'Invitation sent successfully!' });
+    return res.status(200).json({ message: messages.manager.inviteSuccess });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message || messages.common.serverError });
   }
 };
 
@@ -136,13 +132,13 @@ const verifyManager = async (req, res) => {
     // Verify token
     const invite = await ManagerInvites.findOne({ email, token });
     if (!invite) {
-      return res.status(403).json({ error: 'Invalid or expired manager token' });
+      return res.status(403).json({error: messages.auth.tokenExpired});
     }
 
     // (Optional) prevent duplicate accounts
     const existing = await User.findOne({ email });
     if (existing) {
-      return res.status(409).json({ message: 'Email already registered' });
+      return res.status(409).json({message: messages.user.exists  });
     }
 
     // Hash manager password with 10 salt rounds
@@ -161,10 +157,10 @@ const verifyManager = async (req, res) => {
     // Delete token after successful use
     await ManagerInvites.deleteOne({ _id: invite._id });
 
-    return res.status(201).json({ message: 'Manager account verified and created' });
+    return res.status(201).json({ message: messages.manager.verifySuccess });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message || messages.common.serverError });
   }
 };
 
