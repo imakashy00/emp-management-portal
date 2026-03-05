@@ -3,7 +3,7 @@ const crypto = require('node:crypto');
 const bcrypt = require('bcrypt');
 const ManagerInvites = require('../models/managerInvites'); // Use one consistent import
 const { generateToken } = require('../middleware/auth');
-const sendManagerInvite = require('../services/sendEmail');
+const sendManagerInvite = require('../services/sendMail');
 
 /**
  * LOGIN: Find by email, then compare plaintext password using bcrypt.compare
