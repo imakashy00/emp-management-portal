@@ -1,4 +1,4 @@
-const BASE_URL = 'https://8080-aceeaaadefefcfccffeabf.premiumproject.examly.io';
+const BASE_URL = 'https://8080-bbdaeddbbefefcfccffeabf.premiumproject.examly.io';
 console.log(BASE_URL)
 
 const API = {
