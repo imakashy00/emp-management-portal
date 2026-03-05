@@ -1,4 +1,4 @@
-const BASE_URL = 'https://8080-ecdceceebbabefefcfccffeabf.premiumproject.examly.io';
+const BASE_URL = 'https://8080-aceeaaadefefcfccffeabf.premiumproject.examly.io';
 console.log(BASE_URL)
 
 const API = {
@@ -9,4 +9,4 @@ const API = {
     VERIFY_MANAGER: `${BASE_URL}/api/users/verifyManager`,
 };
 
-export default API;
+export default API; 
