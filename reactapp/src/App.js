@@ -154,6 +154,7 @@ import Login from './Components/Login';
 import Signup from './Components/Signup';
 import ErrorPage from './Components/ErrorPage';
 
+
 // Employee
 import EmployeeNavbar from './EmployeeComponents/EmployeeNavbar';
 import LeaveForm from './EmployeeComponents/LeaveForm';
@@ -167,6 +168,7 @@ import LeaveRequest from './ManagerComponents/LeaveRequest';
 import WfhRequest from './ManagerComponents/WfhRequest';
 import RegisterManager from './ManagerComponents/RegisterManager';
 import Dashboard from './Components/Dashboard';
+import ForgotPassword from './Components/ForgotPassword';
 
 // ---------------------------------------------------------
 // 1. Protected Route Wrapper
@@ -231,6 +233,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/error" element={<ErrorPage />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* EMPLOYEE PROTECTED ROUTES */}
         <Route path="/employee" element={
