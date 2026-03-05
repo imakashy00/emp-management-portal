@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import API from '../apiConfig';
+import { toast } from 'react-toastify'; 
+
 const Signup = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -25,23 +27,28 @@ const Signup = () => {
     if (validate()) {
       try {
         const { confirmPassword, ...submitData } = formData;
-        // Logic: Using the SIGNUP key from config
         await axios.post(API.SIGNUP, submitData);
-        alert("User Registration Successful!");
+        
+      
+        toast.success("User Registration Successful!"); 
+        
         navigate('/login');
       } catch (err) {
-        alert(err.response?.data?.message || "Signup failed");
+       
+        const errorMsg = err.response?.data?.message || "Signup failed. Please try again.";
+        toast.error(errorMsg);
       }
+    } else {
+        // Optional: Toast if validation fails
+        toast.warn("Please fix the errors in the form");
     }
   };
 
   return (
-    // Changed min-h-screen to h-screen and added overflow-hidden
     <div className="h-screen w-screen flex items-center justify-center bg-[#f0f2f5] overflow-hidden font-['Segoe_UI',sans-serif]">
-      {/* Reduced max-height to ensure it fits on all laptop screens */}
       <div className="flex flex-col md:flex-row w-full max-w-[900px] h-auto md:h-[520px] bg-white rounded-xl overflow-hidden shadow-2xl mx-4">
         
-        {/* Left Side: Branding (Width reduced slightly to give form more room) */}
+        {/* Left Side: Branding */}
         <div className="flex-1 bg-gradient-to-br from-[#1C4587] to-[#3C78D8] text-white p-8 flex flex-col justify-center">
           <h1 className="text-3xl font-bold mb-1 tracking-tight">WorkBuddy</h1>
           <div className="w-8 h-1 bg-[#FFD966] mb-4"></div>
@@ -55,10 +62,8 @@ const Signup = () => {
           <h2 className="text-2xl font-bold text-center mb-6 text-[#333]">Create Account</h2>
           
           <form onSubmit={handleSubmit}>
-            {/* Added Grid layout to fit inputs side-by-side */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
               
-              {/* User Name - Full Width */}
               <div className="md:col-span-2">
                 <label className="text-[10px] text-gray-400 font-bold uppercase tracking-widest block">User Name *</label>
                 <input 
@@ -69,7 +74,6 @@ const Signup = () => {
                 {errors.userName && <p className="text-[#CC0000] text-[10px] mt-0.5">{errors.userName}</p>}
               </div>
 
-              {/* Email */}
               <div>
                 <label className="text-[10px] text-gray-400 font-bold uppercase tracking-widest block">Email *</label>
                 <input 
@@ -80,7 +84,6 @@ const Signup = () => {
                 {errors.email && <p className="text-[#CC0000] text-[10px] mt-0.5">{errors.email}</p>}
               </div>
 
-              {/* Mobile Number */}
               <div>
                 <label className="text-[10px] text-gray-400 font-bold uppercase tracking-widest block">Mobile *</label>
                 <input 
@@ -91,7 +94,6 @@ const Signup = () => {
                 {errors.mobile && <p className="text-[#CC0000] text-[10px] mt-0.5">{errors.mobile}</p>}
               </div>
 
-              {/* Password */}
               <div>
                 <label className="text-[10px] text-gray-400 font-bold uppercase tracking-widest block">Password *</label>
                 <input 
@@ -102,7 +104,6 @@ const Signup = () => {
                 {errors.password && <p className="text-[#CC0000] text-[10px] mt-0.5">{errors.password}</p>}
               </div>
 
-              {/* Confirm Password */}
               <div>
                 <label className="text-[10px] text-gray-400 font-bold uppercase tracking-widest block">Confirm Password *</label>
                 <input 

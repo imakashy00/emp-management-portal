@@ -1,54 +1,109 @@
 const User = require('../models/userModel');
 const crypto = require('node:crypto');
-const bcrypt=require('bcrypt')
-const ManagerInvites = require('../models/managerInvites');
+const bcrypt = require('bcrypt');
+const ManagerInvites = require('../models/managerInvites'); // Use one consistent import
 const { generateToken } = require('../middleware/auth');
-const sendManagerInvite = require('../services/sendEmail');
-const managerInvites = require('../models/managerInvites');
+const sendManagerInvite = require('../services/sendMail');
 
+/**
+ * LOGIN: Find by email, then compare plaintext password using bcrypt.compare
+ * Route: POST /login
+ * Body: { email, password }
+ */
 const getUserByEmailAndPassword = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email, password });
 
+    // Find by email only
+    const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'Invalid email or password' });
     }
 
+    // Compare plaintext with the stored bcrypt hash
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    // Generate JWT
     const token = generateToken(user.userName, user._id, user.role, user.email);
-    res.status(200).json({
+
+    // Respond without password
+    return res.status(200).json({
       userName: user.userName,
       role: user.role,
-      token: token,
+      token,
       id: user._id
     });
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({ message: error.message });
-
+    return res.status(500).json({ message: error.message });
   }
 };
 
+/**
+ * REGISTER/ADD USER: Hash password with bcrypt (10 salt rounds) before saving
+ * Route: POST /users
+ * Body: { userName, email, password, mobile, role? }
+ */
 const addUser = async (req, res) => {
   try {
-    const user = await User.create(req.body);
-    res.status(200).json({ message: "User added Successfully", user });
+    const { userName, email, password, mobile, role } = req.body;
+
+    // (Optional but recommended) prevent duplicate emails
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(409).json({ message: 'Email already registered' });
+    }
+
+    // Hash password with 10 salt rounds
+    const SALT_ROUNDS = 10;
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+
+    const user = await User.create({
+      userName,
+      email,
+      password: hashedPassword,
+      mobile,
+      role: role || 'employee'
+    });
+
+    // Return safe user (no password)
+    const safeUser = {
+      _id: user._id,
+      userName: user.userName,
+      email: user.email,
+      mobile: user.mobile,
+      role: user.role
+    };
+
+    return res.status(200).json({ message: 'User added Successfully', user: safeUser });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.log(error);
+    return res.status(500).json({ message: error.message });
   }
 };
+
+/**
+ * GET all employees
+ * Route: GET /employees
+ */
 const getAllEmployees = async (req, res) => {
-
   try {
-    const employees = await User.find({ role: 'employee' });
-    res.status(200).json(employees);
+    const employees = await User.find({ role: 'employee' }).select('-password');
+    return res.status(200).json(employees);
   } catch (error) {
-    console.log(error)
-
+    console.log(error);
+    return res.status(500).json({ message: error.message });
   }
+};
 
-}
-
+/**
+ * INVITE MANAGER: creates a 64-char token, persists, and emails the invite
+ * Route: POST /managers/invite
+ * Body: { email, _id }  // _id = inviter's user id (kept as in your original code)
+ */
 const inviteManager = async (req, res) => {
   const { email, _id } = req.body;
 
@@ -62,31 +117,61 @@ const inviteManager = async (req, res) => {
     // Send the email via SendGrid
     await sendManagerInvite(email, token);
 
-    res.status(200).json({ message: "Invitation sent successfully!" });
+    return res.status(200).json({ message: 'Invitation sent successfully!' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.log(err);
+    return res.status(500).json({ error: err.message });
   }
 };
 
-const verifyManager=async (req, res) => {
-  const { userName, email,mobile, password, token } = req.body;
+/**
+ * VERIFY MANAGER: verifies token, creates manager (hashed), deletes invite
+ * Route: POST /managers/verify
+ * Body: { userName, email, mobile, password, token }
+ */
+const verifyManager = async (req, res) => {
+  const { userName, email, mobile, password, token } = req.body;
 
-  // STEP: Token Verification Logic
-  const invite = await managerInvites.findOne({ email, token });
-  
-  if (!invite) {
-      return res.status(403).json({ error: "Invalid or expired manager token" });
+  try {
+    // Verify token
+    const invite = await ManagerInvites.findOne({ email, token });
+    if (!invite) {
+      return res.status(403).json({ error: 'Invalid or expired manager token' });
+    }
+
+    // (Optional) prevent duplicate accounts
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(409).json({ message: 'Email already registered' });
+    }
+
+    // Hash manager password with 10 salt rounds
+    const SALT_ROUNDS = 10;
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+
+    // Create manager user
+    await User.create({
+      userName,
+      email,
+      password: hashedPassword,
+      mobile,
+      role: 'manager'
+    });
+
+    // Delete token after successful use
+    await ManagerInvites.deleteOne({ _id: invite._id });
+
+    return res.status(201).json({ message: 'Manager account verified and created' });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: err.message });
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-  await User.create({ userName, email, password: hashedPassword, mobile, role: 'manager' });
-
-  // Delete token after successful use (One-time use only)
-  await ManagerInvites.deleteOne({ _id: invite._id });
-
-  res.status(201).json({ message: "Manager account verified and created" });
 };
 
-
-
-module.exports = { getUserByEmailAndPassword, addUser, getAllEmployees, inviteManager,verifyManager };
+module.exports = {
+  getUserByEmailAndPassword,
+  addUser,
+  getAllEmployees,
+  inviteManager,
+  verifyManager
+};
