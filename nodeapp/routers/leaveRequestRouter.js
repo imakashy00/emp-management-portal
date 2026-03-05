@@ -1,20 +1,39 @@
 const express = require('express');
 const router = express.Router();
-const leaveRequest = require('../controllers/leaveRequestController');
-// const { generateToken, verifyJWT } = require('../middleware/auth');
+const {
+    viewLeaves,
+    getLeaveRequestById,
+    addLeaveRequest,
+    updateLeaveRequest,
+    deleteLeaveRequest,
+    changeLeaveStatus
+} = require('../controllers/leaveRequestController');
+const { verifyJWT } = require('../middleware/auth');
+const messages = require('../errorMessages/controllerError.json');
 
-// router.use(generateToken);
+// Helper middleware for Role-Based Access Control (RBAC)
+const restrictTo = (role) => {
+    return (req, res, next) => {
+        if (req.user.role === role) {
+            return res.status(403).json({ message: messages.auth.forbidden });
+        }
+        next();
+    };
+};
 
-// Shared View Routes
-router.get('/', leaveRequest.viewLeaves);
-router.get('/:id', leaveRequest.getLeaveRequestById);
+// Protect ALL routes below this line
+router.use(verifyJWT);
+
+// Shared Routes (Both Manager and Employee can view)
+router.get('/', viewLeaves);
+router.get('/:id', getLeaveRequestById);
 
 // Employee Only Routes
-router.post('/',  leaveRequest.addLeaveRequest);
-router.put('/:id',  leaveRequest.updateLeaveRequest);
-router.delete('/:id',  leaveRequest.deleteLeaveRequest);
+router.post('/', restrictTo('employee'), addLeaveRequest);
+router.put('/:id', restrictTo('employee'), updateLeaveRequest);
+router.delete('/:id', restrictTo('employee'), deleteLeaveRequest);
 
 // Manager Only Routes
-router.patch('/:id/status', leaveRequest.changeLeaveStatus);
+router.patch('/:id/status', restrictTo('manager'), changeLeaveStatus);
 
 module.exports = router;
