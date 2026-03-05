@@ -135,5 +135,5 @@ docker-compose.override.yml
 react/tests/
 nodejest/tests
 
-reactapp/src/apiconfig.js
+reactapp/src/apiConfig.js
 nodeapp/config/cors.js
