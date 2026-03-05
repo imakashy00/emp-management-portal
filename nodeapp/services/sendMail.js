@@ -1,21 +1,24 @@
 require('dotenv').config();
 const nodemailer = require('nodemailer');
-
+const SENDER_EMAIL = 'lordhorus02@gmail.com'
+    const GMAIL_APP_PASSWORD = 'korm drox wkqm aocr'
 // 1. Setup the Transport (The engine)
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: process.env.GMAIL_USER, // Your gmail address
-        pass: process.env.GMAIL_APP_PASSWORD // 16-character App Password
-    }
+        user: SENDER_EMAIL, // Your gmail address
+        pass: GMAIL_APP_PASSWORD // 16-character App Password
+    },
+    debug: true, // Show detailed SMTP logs
+    logger: true // Log information to console
 });
 
 const sendManagerInvite = async (email, token) => {
     const inviteLink = `https://8080-aedeaaabddddefefcfccffeabf.premiumproject.examly.io/register-manager?token=${token}&email=${email}`;
-
+    
     // 2. Define the Message
     const mailOptions = {
-        from: `"HR Management" <${process.env.GMAIL_USER}>`,
+        from: `"HR Management" <${SENDER_EMAIL}>`,
         to: email,
         subject: 'Manager Registration Invitation',
         html: `
