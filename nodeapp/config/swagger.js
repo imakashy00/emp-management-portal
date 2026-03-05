@@ -26,7 +26,7 @@ const options = {
     },
   },
   // Path to the API docs (pointing to your routers folder)
-  apis: ['./routers/*.js'], 
+  apis: ['./routers/*.js'],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
