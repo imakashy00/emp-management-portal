@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendManagerInvite = async (email, token) => {
-    const inviteLink = `https://8080-ecdceceebbabefefcfccffeabf.premiumproject.examly.io/register-manager?token=${token}&email=${email}`;
+    const inviteLink = `https://8081-ecdceceebbabefefcfccffeabf.premiumproject.examly.io/register-manager?token=${token}&email=${email}`;
     
     // 2. Define the Message
     const mailOptions = {
