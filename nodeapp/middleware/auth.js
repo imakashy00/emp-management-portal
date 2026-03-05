@@ -20,7 +20,7 @@ function verifyJWT(req, res, next) {
     if (scheme !== 'Bearer' || !token) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
-    const decoded = jwt.verify(token, jwtSecret);
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
     next();
   } catch (err) {

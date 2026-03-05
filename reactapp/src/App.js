@@ -144,7 +144,9 @@
 // export default App;
 
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Components
 import HomePage from './Components/HomePage';
@@ -213,10 +215,14 @@ function Navigation() {
 // ---------------------------------------------------------
 function App() {
   return (
+    
     <Router>
-      {/* Navigation dynamically renders based on the current URL and userRole */}
-      <Navigation />
-      
+      <Navigation/>
+       <>
+      <ToastContainer position="top-right" autoClose={3000} />
+     
+    
+      {/* Minimal layout routes to make navigation coherent with tests */}
       <Routes>
         {/* PUBLIC ROUTES */}
         <Route path="/" element={<Login />} />
@@ -279,6 +285,7 @@ function App() {
         {/* FALLBACK ROUTE */}
         <Route path="*" element={<Navigate to="/error" replace />} />
       </Routes>
+      </>
     </Router>
   );
 }

@@ -1,4 +1,4 @@
-const LeaveRequest = require('../models/LeaveRequest');
+const LeaveRequest = require('../models/leaveRequestModel');
 
 const viewLeaves = async (req, res) => {
   try {
