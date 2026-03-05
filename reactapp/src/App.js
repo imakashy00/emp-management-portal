@@ -282,7 +282,7 @@ function App() {
         {/* Register Manager: we set applyMargin={false} to keep it exactly like your original code */}
         <Route path="/register-manager" element={
           <ProtectedRoute allowedRoles={["manager"]} applyMargin={false}>
-            <RegisterManager />
+            <Signup/>
           </ProtectedRoute>
         } />
 
