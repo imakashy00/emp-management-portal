@@ -87,6 +87,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import API_CONFIG from '../apiConfig'; 
+import { toast } from 'react-toastify'; 
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -106,9 +108,13 @@ const Login = () => {
       localStorage.setItem('userRole', response.data.role);
       localStorage.setItem('userId', response.data.id);
 
+      toast.success("Login Successful! Welcome back.");
+
+
       navigate('/home'); 
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
+      toast.error(errorMsg);
     }
   };
 
