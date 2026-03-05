@@ -1,5 +1,14 @@
 const express = require('express');
-const { getUserByEmailAndPassword, getAllEmployees, addUser, inviteManager, verifyManager } = require('../controllers/userController');
+// Added 'checkEmail' and 'resetPassword' to the imports
+const { 
+  getUserByEmailAndPassword, 
+  getAllEmployees, 
+  addUser, 
+  inviteManager, 
+  verifyManager,
+  checkEmail,     // New Controller function
+  resetPassword   // New Controller function
+} = require('../controllers/userController');
 
 const router = express.Router();
 
@@ -32,12 +41,6 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: User Registration Successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message: { type: string, example: "User added successfully" }
  */
 router.post('/signup', addUser);
 
@@ -60,19 +63,55 @@ router.post('/signup', addUser);
  *     responses:
  *       200:
  *         description: Returns JWT Token and User Info
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 userName: { type: string }
- *                 role: { type: string }
- *                 token: { type: string }
- *                 id: { type: string }
- *       404:
- *         description: User not found
  */
 router.post('/login', getUserByEmailAndPassword);
+
+/**
+ * @swagger
+ * /api/users/check-email:
+ *   post:
+ *     summary: Verify if an email exists in the database (Step 1 of Forgot Password)
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email: { type: string, example: "employee1@example.com" }
+ *     responses:
+ *       200:
+ *         description: Email found and verified
+ *       404:
+ *         description: Email not found
+ */
+router.post('/check-email', checkEmail);
+
+/**
+ * @swagger
+ * /api/users/reset-password:
+ *   put:
+ *     summary: Update password directly (Step 2 of Forgot Password)
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, newPassword]
+ *             properties:
+ *               email: { type: string, example: "employee1@example.com" }
+ *               newPassword: { type: string, example: "newsecurepass123" }
+ *     responses:
+ *       200:
+ *         description: Password updated successfully
+ *       500:
+ *         description: Server error
+ */
+router.put('/reset-password', resetPassword);
 
 /**
  * @swagger
@@ -85,18 +124,6 @@ router.post('/login', getUserByEmailAndPassword);
  *     responses:
  *       200:
  *         description: A list of employees
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   userName: { type: string }
- *                   email: { type: string }
- *                   mobile: { type: string }
- *       400:
- *         description: Authentication failed
  */
 router.get('/getAllEmployees', getAllEmployees);
 
