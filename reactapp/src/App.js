@@ -2,44 +2,21 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import WfhForm from './EmployeeComponents/WfhForm.jsx'
+import ViewWfh from './EmployeeComponents/ViewWfh.jsx'
+import LeaveForm from './EmployeeComponents/LeaveForm.jsx'
+import ViewLeave from './EmployeeComponents/ViewLeave.jsx'
 
-// Layout + top-level pages
 import Dashboard from './Pages/Dashboard.jsx';
-import Home from './Pages/Home.jsx';
-
-// Employee pages
-import ApplyWFH from './Pages/Employee/ApplyWFH.jsx';
-import WFHHistory from './Pages/Employee/WFHHistory.jsx';
-import ApplyLeave from './Pages/Employee/ApplyLeave.jsx';
-import LeaveHistory from './Pages/Employee/LeaveHistory.jsx';
+import ProtectedRoute from './routing/ProtectedRoutes.jsx'
 
 // 3. Manager Specific Components
-import ManagerNavbar from './ManagerComponents/ManagerNavbar';
 import EmployeeList from './ManagerComponents/EmployeeList';
 import LeaveRequest from './ManagerComponents/LeaveRequest';
 import WfhRequest from './ManagerComponents/WfhRequest';
 import RegisterManager from './ManagerComponents/RegisterManager';
+import Login from './Components/Login.jsx';
 
-// ---------------------------------------------------------
-// 1. Protected Route Wrapper (Handles Security & Roles)
-// ---------------------------------------------------------
-const ProtectedRoute = ({ children, allowedRoles }) => {
-  const role = localStorage.getItem("userRole")?.toLowerCase();
-
-  if (!role) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (!allowedRoles.includes(role)) {
-    return <Navigate to="/error" replace />;
-  }
-
-  return children;
-  return children;
-};
-
-// Minimal login placeholder
-const Login = () => <div className="p-6">Login page placeholder</div>;
 
 const App = () => (
   <BrowserRouter>
