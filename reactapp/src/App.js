@@ -166,6 +166,7 @@ import ManagerNavbar from './ManagerComponents/ManagerNavbar';
 import LeaveRequest from './ManagerComponents/LeaveRequest';
 import WfhRequest from './ManagerComponents/WfhRequest';
 import RegisterManager from './ManagerComponents/RegisterManager';
+import Dashboard from './Components/Dashboard';
 
 // ---------------------------------------------------------
 // 1. Protected Route Wrapper
@@ -226,7 +227,7 @@ function App() {
       <Routes>
         {/* PUBLIC ROUTES */}
         <Route path="/" element={<Login />} />
-        <Route path="/home" element={<HomePage />} />
+        <Route path="/home" element={<Dashboard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/error" element={<ErrorPage />} />
