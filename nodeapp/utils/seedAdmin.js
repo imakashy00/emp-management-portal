@@ -1,12 +1,11 @@
 require('dotenv').config();
-const bcrypt = require('bcryptjs');
-const User = require('../models/User');
-
-dotenv.config();
+const bcrypt = require('bcrypt');
+const User = require('../models/userModel');
+const connectDB = require('../config/db');
 
 const seedFirstManager = async () => {
     try {
-        conectDB()
+        connectDB()
         // 2. Check if a manager already exists to prevent duplicates
         const adminExists = await User.findOne({ role: 'manager' });
         if (adminExists) {
@@ -20,8 +19,9 @@ const seedFirstManager = async () => {
 
         // 4. Create the First Manager
         const firstManager = new User({
-            name: 'Super Manager',
+            userName: 'Super Manager',
             email: 'admin@workbuddy.com',
+            mobile:'9876432101',
             password: hashedPassword,
             role: 'manager'
         });
