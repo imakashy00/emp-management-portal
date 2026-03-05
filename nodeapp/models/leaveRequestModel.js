@@ -1,13 +1,53 @@
 const mongoose = require('mongoose');
+const messages = require('../errorMessages/modelError.json');
 
 const leaveRequestSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, required: true },
-  startDate: { type: Date, required: true },
-  endDate: { type: Date, required: true },
-  reason: { type: String, required: true },
-  leaveType: { type: String, required: true },
-  status: { type: String, required: true },
-  file: { type: String, required: true }
-});
+    employeeId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: [true, messages.leave.employeeId]
+    },
+    startDate: {
+        type: Date,
+        required: [true, messages.leave.startDate.required]
+    },
+    endDate: {
+        type: Date,
+        required: [true, messages.leave.endDate.required],
+        validate: {
+            validator: function(value) {
+                // Ensure endDate is not before startDate
+                return value >= this.startDate;
+            },
+            message: messages.leave.endDate.invalid
+        }
+    },
+    reason: {
+        type: String,
+        required: [true, messages.leave.reason.required],
+        minlength: [10, messages.leave.reason.minLength],
+        trim: true
+    },
+    leaveType: {
+        type: String,
+        required: [true, messages.leave.leaveType.required],
+        enum: {
+            values: ['sick', 'vacation', 'casual', 'other'],
+            message: messages.leave.leaveType.enum
+        }
+    },
+    status: {
+        type: String,
+        enum: {
+            values: ['Pending', 'Approved', 'Rejected'],
+            message: messages.leave.status.enum
+        },
+        default: 'Pending'
+    },
+    file: {
+        type: String, // URL or File Path
+        default: null
+    }
+}, { timestamps: true });
 
 module.exports = mongoose.model('LeaveRequest', leaveRequestSchema);

@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const ManagerInvites = require('../models/managerInvites'); 
 const { generateToken } = require('../middleware/auth');
 const sendManagerInvite = require('../services/sendMail');
+const messages = require('../errorMessages/controllerError.json')
 
 /**
  * LOGIN
@@ -13,11 +14,11 @@ const getUserByEmailAndPassword = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email.trim().toLowerCase() }); // Robust check
     if (!user) {
-      return res.status(404).json({ message: 'Invalid email or password' });
+      return res.status(404).json({ message: messages.auth.invalid });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: messages.auth.invalid });
     }
     const token = generateToken(user.userName, user._id, user.role, user.email);
     return res.status(200).json({
@@ -27,7 +28,8 @@ const getUserByEmailAndPassword = async (req, res) => {
       id: user._id
     });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    console.log(error.message);
+    return res.status(500).json({ message: error.message || messages.common.serverError });
   }
 };
 
@@ -105,7 +107,7 @@ const addUser = async (req, res) => {
     
     const existing = await User.findOne({ email: processedEmail });
     if (existing) {
-      return res.status(409).json({ message: 'Email already registered' });
+      return res.status(409).json({ message: messages.user.exists });
     }
     
     const SALT_ROUNDS = 10;
@@ -118,10 +120,16 @@ const addUser = async (req, res) => {
       mobile,
       role: role || 'employee'
     });
+
+    // Return safe user (no password)
+   
+    return res.status(200).json({
+      message: messages.user.addSuccess,
     
-    return res.status(200).json({ message: 'User added Successfully' });
+    });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    console.log(error);
+    return res.status(500).json({ message: error.message || messages.common.serverError });
   }
 };
 
@@ -134,7 +142,8 @@ const getAllEmployees = async (req, res) => {
     const employees = await User.find({ role: 'employee' }).select('-password');
     return res.status(200).json(employees);
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    console.log(error);
+    return res.status(500).json({ message: messages.user.fetchError});
   }
 };
 
@@ -144,9 +153,11 @@ const inviteManager = async (req, res) => {
   try {
     await ManagerInvites.create({ email, token, invitedBy: _id });
     await sendManagerInvite(email, token);
-    return res.status(200).json({ message: 'Invitation sent successfully!' });
+
+    return res.status(200).json({ message: messages.manager.inviteSuccess });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    console.log(err);
+    return res.status(500).json({ error: err.message || messages.common.serverError });
   }
 };
 
@@ -154,14 +165,26 @@ const verifyManager = async (req, res) => {
   const { userName, email, mobile, password, token } = req.body;
   try {
     const invite = await ManagerInvites.findOne({ email, token });
-    if (!invite) return res.status(403).json({ error: 'Invalid or expired token' });
+    if (!invite) {
+      return res.status(403).json({error: messages.auth.tokenExpired});
+    }
+
+    // (Optional) prevent duplicate accounts
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(409).json({message: messages.user.exists  });
+    }
+
+    // Hash manager password with 10 salt rounds
     const SALT_ROUNDS = 10;
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
     await User.create({ userName, email, password: hashedPassword, mobile, role: 'manager' });
     await ManagerInvites.deleteOne({ _id: invite._id });
-    return res.status(201).json({ message: 'Manager account created' });
+
+    return res.status(201).json({ message: messages.manager.verifySuccess });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    console.log(err);
+    return res.status(500).json({ error: err.message || messages.common.serverError });
   }
 };
 

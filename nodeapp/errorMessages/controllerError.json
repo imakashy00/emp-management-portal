@@ -1,0 +1,39 @@
+{
+  "auth": {
+    "invalid": "Invalid email or password",
+    "tokenExpired": "Invalid or expired manager token",
+    "unauthorized": "Unauthorized access",
+    "forbidden": "You do not have permission to perform this action",
+    "noToken": "No token provided, access denied"
+  },
+  "user": {
+    "exists": "Email already registered",
+    "addSuccess": "User added Successfully",
+    "fetchError": "Error retrieving employees"
+  },
+  "manager": {
+    "inviteSuccess": "Invitation sent successfully!",
+    "verifySuccess": "Manager account verified and created"
+  },
+  "leave": {
+    "notFound": "Leave request not found",
+    "fetchError": "No leave requests found.",
+    "addSuccess": "Leave request created successfully",
+    "updateUnauthorized": "Unauthorized to edit this request",
+    "deleteStatusError": "Cannot delete a request that is already processed",
+    "invalidStatus": "Invalid status. Must be Approved, Rejected, or Pending",
+    "deleteSuccess": "Deleted successfully"
+  },
+  "wfh": {
+    "notFound": "WFH request not found",
+    "fetchError": "Error fetching WFH requests",
+    "addSuccess": "WFH request created successfully",
+    "updateUnauthorized": "Unauthorized to edit this request",
+    "deleteStatusError": "Cannot delete a processed WFH request",
+    "invalidStatus": "Invalid status. Must be Approved or Rejected",
+    "deleteSuccess": "WFH request deleted successfully"
+  },
+  "common": {
+    "serverError": "Internal Server Error"
+  }
+}
