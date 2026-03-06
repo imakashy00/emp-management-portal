@@ -19,7 +19,7 @@ export const publicRoutes = [
 ];
 
 export const protectedRoutes = [
-    { path: '', element: <Home />, roles: ['employee', 'manager'] }, 
+    { path: '', element: <Home />, roles: ['employee', 'manager'] },
     { path: 'apply-wfh', element: <WfhForm />, roles: ['employee'] },
     { path: 'wfh-history', element: <ViewWfh />, roles: ['employee'] },
     { path: 'apply-leave', element: <LeaveForm />, roles: ['employee'] },
