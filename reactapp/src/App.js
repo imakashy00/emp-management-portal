@@ -12,28 +12,18 @@ const App = () => (
   <BrowserRouter>
     <ToastContainer position="top-right" autoClose={2000} hideProgressBar={true} />
     <Routes>
-      {/* Public Routes (Login, Signup, Forgot Password) */}
+   
       {publicRoutes.map(({ path, element }) => (
         <Route key={path} path={path} element={element} />
       ))}
 
-      {/* Protected Layout Routes (Side-Nav Dashboard) */}
+     
       <Route path="/" element={
         <ProtectedRoute allowedRoles={['employee', 'manager']}>
           <Dashboard />
         </ProtectedRoute>
       }>
-        {/* 
-            2. ADD PROFILE ROUTE MANUALLY 
-            This ensures it renders inside the Dashboard Outlet
-        */}
-        <Route path="profile" element={
-          <ProtectedRoute allowedRoles={['employee', 'manager']}>
-            <Profile />
-          </ProtectedRoute>
-        } />
-
-        {/* All these children will render inside Dashboard's <Outlet /> */}
+       
         {protectedRoutes.map(({ path, element, roles }) => (
           <Route
             key={path}
