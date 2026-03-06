@@ -12,7 +12,7 @@ const leaveRequestSchema = new mongoose.Schema({
         type: Date,
         required: [true, messages.leave.endDate.required],
         validate: {
-            validator: function(value) { return value >= this.startDate; },
+            validator: function (value) { return value >= this.startDate; },
             message: messages.leave.endDate.invalid
         }
     },
@@ -26,12 +26,25 @@ const leaveRequestSchema = new mongoose.Schema({
         required: [true, messages.leave.leaveType.required],
         enum: {
             // MUST include 'PTO' exactly like this
-            values: ['Sick Leave', 'Casual Leave', 'PTO', 'Vacation'], 
+            values: ['Sick Leave', 'Casual Leave', 'PTO', 'Vacation'],
             message: "{VALUE} is not a valid leave type"
         }
     },
-    status: { type: String, default: 'Pending' },
-    file: { type: String, default: null }
-}, { timestamps: true });
+    status: {
+        type: String,
+        enum: {
+            values: ['Pending', 'Approved', 'Rejected'],
+            message: messages.leave.status.enum
+        },
+        default: 'Pending'
+    },
+    file: {
+        type: String, // URL or File Path
+        default: null
+    }
+
+}, {
+    timestamps: true
+});
 
 module.exports = mongoose.model('LeaveRequest', leaveRequestSchema);
