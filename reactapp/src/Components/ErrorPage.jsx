@@ -23,10 +23,8 @@ const ErrorPage = () => {
   };
 
   return (
-    // Background matches your --bg-light
     <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--bg-light)] px-4">
       
-      {/* Card Container using your border and background variables */}
       <div className="bg-white p-10 rounded-xl shadow-lg border border-[var(--border-color)] flex flex-col items-center max-w-md w-full">
         
         {/* Title using your --danger color */}
@@ -34,12 +32,11 @@ const ErrorPage = () => {
           Oops! Something Went Wrong
         </h1>
         
-        {/* Subtitle using your --text-muted color */}
         <p className="text-[var(--text-muted)] text-center mb-8 text-sm sm:text-base">
           Please try again later.
         </p>
 
-        {/* Warning Icon matched to the image (styled with --text-main) */}
+       
         <svg 
           className="w-32 h-32 text-[var(--text-main)] mb-8" 
           fill="none" 
@@ -55,7 +52,6 @@ const ErrorPage = () => {
           />
         </svg>
 
-        {/* Action Button using your --primary-blue and --secondary-blue for hover */}
         <button 
           onClick={handleGoHome}
           className="px-6 py-2.5 rounded-md font-semibold text-white transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 hover:shadow-md bg-[var(--primary-blue)] hover:bg-[var(--secondary-blue)] active:scale-95"
