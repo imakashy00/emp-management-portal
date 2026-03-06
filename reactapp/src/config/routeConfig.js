@@ -8,17 +8,18 @@ import WfhForm from "../EmployeeComponents/WfhForm";
 import EmployeeList from '../ManagerComponents/EmployeeList';
 import LeaveRequest from '../ManagerComponents/LeaveRequest';
 import WfhRequest from '../ManagerComponents/WfhRequest';
-import RegisterManager from '../ManagerComponents/RegisterManager';
 import Home from "../Pages/Home"; // Import Home here
+import ManagerInvitation from "../Components/ManagerInvitation";
 
 export const publicRoutes = [
     { path: '/login', element: <Login /> },
     { path: '/signup', element: <Signup /> },
     { path: '/forgot-password', element: <ForgotPassword /> },
+    { path: '/register-manager', element: <Signup />},
 ];
 
 export const protectedRoutes = [
-    { path: '', element: <Home />, roles: ['employee', 'manager'] }, // Empty path is the 'index'
+    { path: '', element: <Home />, roles: ['employee', 'manager'] }, 
     { path: 'apply-wfh', element: <WfhForm />, roles: ['employee'] },
     { path: 'wfh-history', element: <ViewWfh />, roles: ['employee'] },
     { path: 'apply-leave', element: <LeaveForm />, roles: ['employee'] },
@@ -26,5 +27,5 @@ export const protectedRoutes = [
     { path: 'employees', element: <EmployeeList />, roles: ['manager'] },
     { path: 'manager/wfh', element: <WfhRequest />, roles: ['manager'] },
     { path: 'manager/leave', element: <LeaveRequest />, roles: ['manager'] },
-    { path: 'invite-manager', element: <RegisterManager />, roles: ['manager'] },
+    { path: 'invite-manager', element: <ManagerInvitation />, roles: ['manager'] },
 ];

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useOutletContext } from 'react-router-dom'; // 1. Import this hook
 
 const WelcomeCard = ({ userName }) => (
   <div className="bg-white rounded-2xl p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 flex flex-col items-center text-center">
