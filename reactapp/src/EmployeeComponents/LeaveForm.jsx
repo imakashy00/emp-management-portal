@@ -1,12 +1,8 @@
 import React from 'react';
-import Form from '../EmployeeComponents/Form';
+import Form from './Form';
 
-const SickLeaveForm = () => {
-  return (
-    <div className="flex-1 p-10 bg-[#f4f7f6] min-h-screen flex items-center justify-center">
-      <Form type="SICK_LEAVE" />
-    </div>
-  );
+const LeaveForm = () => {
+  return <Form type="LEAVE" />;
 };
 
-export default SickLeaveForm;
+export default LeaveForm;
