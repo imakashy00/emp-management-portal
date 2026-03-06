@@ -140,6 +140,7 @@ module.exports = {
   getUserByEmailAndPassword,
   addUser,
   getAllEmployees,
+  deleteUser,
   inviteManager,
   checkEmail,
   resetPassword,
