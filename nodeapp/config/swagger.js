@@ -1,4 +1,6 @@
 const swaggerJSDoc = require('swagger-jsdoc');
+const backend_uri = process.env.backend_uri;
+console.log(backend_uri)
 
 const options = {
   definition: {
@@ -8,6 +10,10 @@ const options = {
       version: '1.0.0',
     },
     servers: [
+      {
+        url: backend_uri,
+        description: 'Development Server',
+      },
       { url: 'http://localhost:8080' }
     ],
     components: {

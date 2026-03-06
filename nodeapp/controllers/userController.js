@@ -169,13 +169,11 @@ const verifyManager = async (req, res) => {
       return res.status(403).json({error: messages.auth.tokenExpired});
     }
 
-    // (Optional) prevent duplicate accounts
     const existing = await User.findOne({ email });
     if (existing) {
       return res.status(409).json({message: messages.user.exists  });
     }
 
-    // Hash manager password with 10 salt rounds
     const SALT_ROUNDS = 10;
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
     await User.create({ userName, email, password: hashedPassword, mobile, role: 'manager' });

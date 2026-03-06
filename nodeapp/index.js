@@ -1,8 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const connectDB = require('./config/db'); // Import DB config
-const corsOptions = require('./config/cors'); // Import CORS config
+const connectDB = require('./config/db'); 
+const corsOptions = require('./config/cors'); 
 const userRouter = require('./routers/userRouter');
 const app = express();
 const swaggerUi = require('swagger-ui-express');
@@ -10,10 +10,9 @@ const swaggerSpec = require('./config/swagger');
 const leaveRequest=require('./routers/leaveRequestRouter')
 const wfhRequest=require('./routers/wfhRequestRouter')
 
-// const PORT = process.env.PORT || 8080;
-const PORT = 8080;
+const PORT = process.env.port;
 
-// Connect to Database
+// Connecting to Database
 connectDB();
 
 // Middleware
