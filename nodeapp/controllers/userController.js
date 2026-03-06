@@ -2,7 +2,7 @@ const User = require('../models/userModel');
 const WfhRequest = require('../models/wfhRequestModel');
 const crypto = require('node:crypto');
 const bcrypt = require('bcrypt');
-const ManagerInvites = require('../models/managerInvites'); 
+const ManagerInvites = require('../models/managerInvites');
 const { generateToken } = require('../middleware/auth');
 const sendManagerInvite = require('../services/sendMail');
 const messages = require('../errorMessages/controllerError.json');
@@ -15,7 +15,7 @@ const getUserByEmailAndPassword = async (req, res) => {
     if (!user) return res.status(404).json({ message: messages.auth.invalid });
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: messages.auth.invalid });
-    
+
     const token = generateToken(user.userName, user._id, user.role, user.email);
     return res.status(200).json({ userName: user.userName, role: user.role, token, id: user._id });
   } catch (error) {
@@ -28,7 +28,7 @@ const addUser = async (req, res) => {
     const { userName, email, password, mobile, role } = req.body;
     const existing = await User.findOne({ email: email.toLowerCase() });
     if (existing) return res.status(409).json({ message: messages.user.exists });
-    
+
     const hashedPassword = await bcrypt.hash(password, 10);
     await User.create({ userName, email: email.toLowerCase(), password: hashedPassword, mobile, role: role || 'employee' });
     return res.status(200).json({ message: messages.user.addSuccess });
@@ -65,7 +65,7 @@ const addWfhRequest = async (req, res) => {
   try {
     const { userId, startDate, endDate, reason } = req.body;
     const newRequest = await WfhRequest.create({
-      employeeId: userId, 
+      employeeId: userId,
       startDate,
       endDate,
       reason,
@@ -94,7 +94,7 @@ const updateWfhRequest = async (req, res) => {
 
     // 1. Find the existing document first
     const request = await WfhRequest.findById(req.params.id);
-    
+
     if (!request) {
       return res.status(404).json({ message: "Request not found" });
     }
@@ -108,9 +108,9 @@ const updateWfhRequest = async (req, res) => {
     // 3. Save the document (This triggers the Schema validators properly)
     await request.save();
 
-    return res.status(200).json({ 
-      message: "WFH Request updated successfully", 
-      data: request 
+    return res.status(200).json({
+      message: "WFH Request updated successfully",
+      data: request
     });
   } catch (error) {
     console.error("Update Error:", error.message);
@@ -148,6 +148,14 @@ const inviteManager = async (req, res) => {
     await sendManagerInvite(email, token);
     return res.status(200).json({ message: messages.manager.inviteSuccess });
   } catch (err) {
+    if (err.code === 11000) {
+      // This logic finds which field caused the duplicate error (userName or email)
+      const duplicateField = Object.keys(err.keyValue)[0];
+
+      return res.status(400).json({
+        message: `The ${duplicateField} "${err.keyValue[duplicateField]}" is already taken. Please try another.`
+      });
+    }
     return res.status(500).json({ error: err.message });
   }
 };
