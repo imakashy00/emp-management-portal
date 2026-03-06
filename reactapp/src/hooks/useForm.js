@@ -1,101 +1,89 @@
-import { useState } from 'react';
-import { toast } from 'react-toastify';
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-const API='sdfjsd'
+import API from '../apiConfig';
+import { toast } from 'react-toastify';
+
 export const useForm = (type) => {
-    const [formData, setFormData] = useState({
-        startDate: '',
-        endDate: '',
-        reason: '',
-        attachment: null, // Stores the File object
-    });
+  const location = useLocation();
+  const navigate = useNavigate();
+  const editData = location.state?.editData;
 
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    startDate: '',
+    endDate: '',
+    reason: '',
+    leaveType: 'Sick Leave', // Added for Leave functionality
+    attachment: null
+  });
 
-    const handleInputChange = (e) => {
-        const { name, value, files, type } = e.target;
+  useEffect(() => {
+    if (editData) {
+      const formatDate = (d) => new Date(d).toISOString().split('T')[0];
+      setFormData({
+        startDate: formatDate(editData.startDate),
+        endDate: formatDate(editData.endDate),
+        reason: editData.reason,
+        leaveType: editData.leaveType || 'Sick Leave',
+        attachment: null
+      });
+    }
+  }, [editData]);
 
-        // Special handling for file uploads
-        if (type === 'file') {
-            setFormData((prev) => ({
-                ...prev,
-                [name]: files[0], // Store the actual file object
-            }));
-        } else {
-            setFormData((prev) => ({
-                ...prev,
-                [name]: value,
-            }));
-        }
-    };
+  const handleInputChange = (e) => {
+    const { name, value, files } = e.target;
+    setFormData({ ...formData, [name]: files ? files[0] : value });
+  };
 
-    const validateForm = () => {
-        // 1. Check basic required fields
-        if (!formData.startDate || !formData.endDate || !formData.reason) {
-            alert("Please fill in all required fields.");
-            return false;
-        }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-        // 2. Validate Dates (End date cannot be before Start date)
-        if (new Date(formData.endDate) < new Date(formData.startDate)) {
-            alert("End date cannot be earlier than start date.");
-            return false;
-        }
+    try {
+      const userId = localStorage.getItem('userId');
+      const isWFH = type === 'WFH';
 
-        // 3. Mandatory File Check for Sick Leave
-        if (type === 'SICK_LEAVE' && !formData.attachment) {
-            alert("A medical certificate is mandatory for Sick Leave requests.");
-            return false;
-        }
+      // --- ENDPOINT SELECTION ---
+      const createURL = isWFH ? API.ADD_WFH : API.ADD_LEAVE;
+      const updateURL = isWFH ? `${API.UPDATE_WFH}/${editData?._id}` : `${API.UPDATE_LEAVE}/${editData?._id}`;
+      const finalURL = editData ? updateURL : createURL;
 
-        return true;
-    };
+      // --- PAYLOAD SELECTION ---
+      let payload;
+      let headers = {};
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError(null);
+      if (isWFH) {
+        // WFH uses JSON
+        payload = { ...formData, employeeId: userId };
+        headers = { 'Content-Type': 'application/json' };
+      } else {
+        // LEAVE uses FormData for file upload
+        payload = new FormData();
+        payload.append('employeeId', userId);
+        payload.append('startDate', formData.startDate);
+        payload.append('endDate', formData.endDate);
+        payload.append('reason', formData.reason);
+        payload.append('leaveType', formData.leaveType);
+        if (formData.attachment) payload.append('file', formData.attachment);
+        headers = { 'Content-Type': 'multipart/form-data' };
+      }
 
-        if (!validateForm()) return;
+      if (editData) {
+        await axios.put(finalURL, payload, { headers });
+      } else {
+        await axios.post(finalURL, payload, { headers });
+      }
 
-        setLoading(true);
+      toast.success(`${type} Request ${editData ? 'Updated' : 'Submitted'} Successfully!`);
+      navigate(isWFH ? '/wfh-history' : '/leave-history');
 
-        try {
-            // Logic for sending data to your API
-            // Since we have a file, we use FormData instead of a JSON object
-            const submissionData = new FormData();
-            submissionData.append('type', type);
-            submissionData.append('startDate', formData.startDate);
-            submissionData.append('endDate', formData.endDate);
-            submissionData.append('reason', formData.reason);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Operation failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            if (formData.attachment) {
-                submissionData.append('attachment', formData.attachment);
-            }
-
-            const endpoint = type === 'SICK_LEAVE' ? API.ADD_SICK_LEAVE : API.ADD_WFH;
-
-            // Simulate API Call
-            await axios.post(endpoint, submissionData);
-
-            // alert(`${requestType === 'SICK_LEAVE' ? 'Sick Leave' : 'WFH'} request submitted successfully!`);
-
-            toast.success(`${type === 'SICK_LEAVE' ? 'Sick Leave' : 'WFH'} Request Submitted!`);
-            setFormData({ startDate: '', endDate: '', reason: '', attachment: null });
-
-        } catch (err) {
-            setError("Failed to submit request. Please try again.");
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return {
-        formData,
-        loading,
-        error,
-        handleInputChange,
-        handleSubmit,
-    };
+  return { formData, loading, handleInputChange, handleSubmit, isEdit: !!editData };
 };
