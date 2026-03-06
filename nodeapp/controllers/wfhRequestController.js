@@ -17,7 +17,7 @@ const viewWfhRequests = async (req, res) => {
 
 const getWfhRequestById = async (req, res) => {
   try {
-    const request = await WfhRequest.findById(req.params.id);
+    const request = await WfhRequest.findById({ employeeId: req.params.userId }).sort({ createdAt: -1 });
     if (!request) return res.status(404).json({ message: messages.wfh.notFound });
     res.status(200).json(request);
   } catch (error) {
@@ -26,10 +26,18 @@ const getWfhRequestById = async (req, res) => {
 };
 
 const addWfhRequest = async (req, res) => {
+  const { userId, employeeId, startDate, endDate, reason } = req.body;
+  const finalEmployeeId = employeeId || userId;
+  if (!finalEmployeeId) {
+    return res.status(400).json({ message: messages.wfh.employeeNotFound });
+  }
   try {
     const newRequest = await WfhRequest.create({
-      ...req.body,
-      employeeId: req.user.id
+      employeeId: finalEmployeeId, // This MUST match your Schema key
+      startDate,
+      endDate,
+      reason,
+      status: 'Pending'
     });
     res.status(201).json({ message: messages.wfh.addSuccess, data: newRequest });
   } catch (error) {
@@ -49,8 +57,11 @@ const updateWfhRequest = async (req, res) => {
       return res.status(400).json({ message: messages.wfh.deleteStatusError });
     }
 
-    const updated = await WfhRequest.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.status(200).json(updated);
+    const updated = await WfhRequest.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    res.status(200).json({
+      message: messages.wfh.updatedRequest,
+      data: updated
+    });
   } catch (error) {
     res.status(500).json({ message: messages.common.serverError });
   }
@@ -64,7 +75,7 @@ const deleteWfhRequest = async (req, res) => {
     if (request.employeeId.toString() !== req.user.id) {
       return res.status(403).json({ message: messages.auth.unauthorized });
     }
-    
+
     await WfhRequest.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: messages.wfh.deleteSuccess });
   } catch (error) {

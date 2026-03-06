@@ -25,10 +25,12 @@
     "deleteSuccess": "Deleted successfully"
   },
   "wfh": {
+    "employeeNotFound": "Employee ID is missing",
     "notFound": "WFH request not found",
     "fetchError": "Error fetching WFH requests",
     "addSuccess": "WFH request created successfully",
     "updateUnauthorized": "Unauthorized to edit this request",
+    "updatedRequest": "Request updated successfully",
     "deleteStatusError": "Cannot delete a processed WFH request",
     "invalidStatus": "Invalid status. Must be Approved or Rejected",
     "deleteSuccess": "WFH request deleted successfully"
