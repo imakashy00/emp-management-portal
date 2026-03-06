@@ -8,9 +8,7 @@ import {
   UserPlus,
   History,
   LogOut,
-  LayoutDashboard,
   User,
-  Settings,
   FilePlus
 } from 'lucide-react';
 
@@ -62,11 +60,12 @@ const Sidebar = ({ isOpen, isManager, onNavigate, onLogout, userName, role }) =>
 
         {isManager ? (
           <div className="pt-6 space-y-1.5">
-            <p className="px-4 text-[10px] font-bold text-blue-300/60 uppercase tracking-[0.2em] mb-3">Management</p>
+            <p className="px-4 text-[10px] font-bold text-gray-600 uppercase tracking-[0.2em] mb-3">Management</p>
             <SidebarItem icon={Users} label="Employee Directory" isActive={isPathActive('/employees')} onClick={() => onNavigate('/employees')} />
             <SidebarItem icon={Laptop} label="WFH Approvals" isActive={isPathActive('/manager/wfh')} onClick={() => onNavigate('/manager/wfh')} />
             <SidebarItem icon={FileText} label="Leave Approvals" isActive={isPathActive('/manager/leave')} onClick={() => onNavigate('/manager/leave')} />
-            <div className="mt-4 pt-4 border-t border-white/5">
+            <div className=" pt-4 border-t my-3">
+              <p className="px-4 text-[10px] font-bold text-gray-600 uppercase tracking-[0.2em] my-3">Invite</p>
               <SidebarItem icon={UserPlus} label="Invite Manager" isActive={isPathActive('/invite-manager')} onClick={() => onNavigate('/invite-manager')} />
             </div>
           </div>
@@ -74,7 +73,7 @@ const Sidebar = ({ isOpen, isManager, onNavigate, onLogout, userName, role }) =>
           <div className="pt-6 space-y-6">
             <div>
               <p className="px-4 text-[10px] font-bold text-gray-600 uppercase tracking-[0.2em] mb-3">Remote Work</p>
-              <SidebarItem icon={FilePlus } label="Apply for WFH" isActive={isPathActive('/apply-wfh')} onClick={() => onNavigate('/apply-wfh')} />
+              <SidebarItem icon={FilePlus} label="Apply for WFH" isActive={isPathActive('/apply-wfh')} onClick={() => onNavigate('/apply-wfh')} />
               <SidebarItem icon={History} label="My WFH History" isActive={isPathActive('/wfh-history')} onClick={() => onNavigate('/wfh-history')} />
             </div>
 
