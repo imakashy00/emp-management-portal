@@ -14,7 +14,7 @@ export const useForm = (type) => {
     startDate: '',
     endDate: '',
     reason: '',
-    leaveType: 'Sick Leave', // Matches the updated model enum
+    leaveType: 'Sick Leave',
     file: null
   });
 
