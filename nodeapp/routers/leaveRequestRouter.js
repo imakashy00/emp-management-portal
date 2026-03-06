@@ -1,39 +1,22 @@
+// --- routers/leaveRequestRouter.js (Complete) ---
 const express = require('express');
 const router = express.Router();
-const {
-    viewLeaves,
-    getLeaveRequestById,
-    addLeaveRequest,
-    updateLeaveRequest,
-    deleteLeaveRequest,
-    changeLeaveStatus
-} = require('../controllers/leaveRequestController');
-const { verifyJWT } = require('../middleware/auth');
-const messages = require('../errorMessages/controllerError.json');
+const multer = require('multer');
+const { addLeaveRequest, getLeaveRequestsByUserId, deleteLeaveRequest, updateLeaveRequest } = require('../controllers/userController');
 
-// Helper middleware for Role-Based Access Control (RBAC)
-const restrictTo = (role) => {
-    return (req, res, next) => {
-        if (req.user.role === role) {
-            return res.status(403).json({ message: messages.auth.forbidden });
-        }
-        next();
-    };
-};
+// Multer Storage Configuration
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
+});
+const upload = multer({ storage });
 
-// Protect ALL routes below this line
-router.use(verifyJWT);
+// The string 'file' here MUST match the payload.append('file', ...) on frontend
+router.post('/addLeaveRequest', upload.single('file'), addLeaveRequest);
 
-// Shared Routes (Both Manager and Employee can view)
-router.get('/', viewLeaves);
-router.get('/:id', getLeaveRequestById);
-
-// Employee Only Routes
-router.post('/', restrictTo('employee'), addLeaveRequest);
-router.put('/:id', restrictTo('employee'), updateLeaveRequest);
-router.delete('/:id', restrictTo('employee'), deleteLeaveRequest);
-
-// Manager Only Routes
-router.patch('/:id/status', restrictTo('manager'), changeLeaveStatus);
+// Other routes
+router.get('/getLeaveRequestsByUserId/:userId', getLeaveRequestsByUserId);
+router.put('/updateLeaveRequest/:id', upload.single('file'), updateLeaveRequest);
+router.delete('/deleteLeaveRequest/:id', deleteLeaveRequest);
 
 module.exports = router;

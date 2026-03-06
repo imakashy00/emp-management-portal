@@ -1,4 +1,3 @@
-// src/hooks/useForm.js - FULL UPDATED CODE
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -15,8 +14,8 @@ export const useForm = (type) => {
     startDate: '',
     endDate: '',
     reason: '',
-    leaveType: 'Sick Leave',
-    attachment: null
+    leaveType: 'Sick Leave', // Matches the updated model enum
+    file: null
   });
 
   useEffect(() => {
@@ -27,14 +26,18 @@ export const useForm = (type) => {
         endDate: formatDate(editData.endDate),
         reason: editData.reason,
         leaveType: editData.leaveType || 'Sick Leave',
-        attachment: null
+        file: null
       });
     }
   }, [editData]);
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
-    setFormData({ ...formData, [name]: files ? files[0] : value });
+    if (name === 'file') {
+      setFormData({ ...formData, file: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -42,42 +45,31 @@ export const useForm = (type) => {
     setLoading(true);
 
     try {
-      // 1. Get ID - WE SEND BOTH KEYS TO BE SAFE
       const storedId = localStorage.getItem('userId');
-      
-      if (!storedId) {
-        toast.error("Session expired. Please log in again.");
-        return navigate('/login');
-      }
+      if (!storedId) return toast.error("Session expired. Please Login.");
 
       const isWFH = type === 'WFH';
       let payload;
       let headers = {};
 
       if (isWFH) {
-        // --- WFH PAYLOAD (JSON) ---
         payload = {
-          employeeId: storedId, // Explicitly match your Mongoose Model
-          userId: storedId,     // Extra safety for the controller
+          employeeId: storedId,
           startDate: formData.startDate,
           endDate: formData.endDate,
           reason: formData.reason
         };
         headers = { 'Content-Type': 'application/json' };
       } else {
-        // --- LEAVE PAYLOAD (FormData) ---
         payload = new FormData();
         payload.append('employeeId', storedId);
-        payload.append('userId', storedId);
         payload.append('startDate', formData.startDate);
         payload.append('endDate', formData.endDate);
         payload.append('reason', formData.reason);
         payload.append('leaveType', formData.leaveType);
-        if (formData.attachment) payload.append('file', formData.attachment);
+        if (formData.file) payload.append('file', formData.file);
         headers = { 'Content-Type': 'multipart/form-data' };
       }
-
-      console.log("DEBUG: Sending Payload:", payload);
 
       const endpoint = editData 
         ? (isWFH ? `${API.UPDATE_WFH}/${editData._id}` : `${API.UPDATE_LEAVE}/${editData._id}`)
@@ -93,7 +85,6 @@ export const useForm = (type) => {
       navigate(isWFH ? '/wfh-history' : '/leave-history');
 
     } catch (err) {
-      console.error("Submission Error Response:", err.response?.data);
       toast.error(err.response?.data?.message || "Validation Error. Check all fields.");
     } finally {
       setLoading(false);
