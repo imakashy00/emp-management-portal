@@ -61,18 +61,33 @@ const resetPassword = async (req, res) => {
 };
 
 // --- WFH REQUESTS ---
+// Inside controllers/userController.js
+
 const addWfhRequest = async (req, res) => {
   try {
-    const { userId, startDate, endDate, reason } = req.body;
+    // Safety Log - Check your Node.js terminal
+    console.log("BACKEND RECEIVED:", req.body);
+
+    const { userId, employeeId, startDate, endDate, reason } = req.body;
+
+    // Use whichever ID is available
+    const finalEmployeeId = employeeId || userId;
+
+    if (!finalEmployeeId) {
+      return res.status(400).json({ message: "Employee ID is missing from request" });
+    }
+
     const newRequest = await WfhRequest.create({
-      employeeId: userId, 
+      employeeId: finalEmployeeId, // This MUST match your Schema key
       startDate,
       endDate,
       reason,
       status: 'Pending'
     });
+
     return res.status(200).json({ message: "WFH Request added Successfully", data: newRequest });
   } catch (error) {
+    console.error("Mongoose DB Error:", error.message);
     return res.status(400).json({ message: error.message });
   }
 };
