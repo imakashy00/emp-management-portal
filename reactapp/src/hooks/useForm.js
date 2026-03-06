@@ -1,3 +1,4 @@
+// src/hooks/useForm.js - FULL UPDATED CODE
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -14,13 +15,13 @@ export const useForm = (type) => {
     startDate: '',
     endDate: '',
     reason: '',
-    leaveType: 'Sick Leave', // Added for Leave functionality
+    leaveType: 'Sick Leave',
     attachment: null
   });
 
   useEffect(() => {
     if (editData) {
-      const formatDate = (d) => new Date(d).toISOString().split('T')[0];
+      const formatDate = (dateStr) => new Date(dateStr).toISOString().split('T')[0];
       setFormData({
         startDate: formatDate(editData.startDate),
         endDate: formatDate(editData.endDate),
@@ -41,26 +42,33 @@ export const useForm = (type) => {
     setLoading(true);
 
     try {
-      const userId = localStorage.getItem('userId');
+      // 1. Get ID - WE SEND BOTH KEYS TO BE SAFE
+      const storedId = localStorage.getItem('userId');
+      
+      if (!storedId) {
+        toast.error("Session expired. Please log in again.");
+        return navigate('/login');
+      }
+
       const isWFH = type === 'WFH';
-
-      // --- ENDPOINT SELECTION ---
-      const createURL = isWFH ? API.ADD_WFH : API.ADD_LEAVE;
-      const updateURL = isWFH ? `${API.UPDATE_WFH}/${editData?._id}` : `${API.UPDATE_LEAVE}/${editData?._id}`;
-      const finalURL = editData ? updateURL : createURL;
-
-      // --- PAYLOAD SELECTION ---
       let payload;
       let headers = {};
 
       if (isWFH) {
-        // WFH uses JSON
-        payload = { ...formData, employeeId: userId };
+        // --- WFH PAYLOAD (JSON) ---
+        payload = {
+          employeeId: storedId, // Explicitly match your Mongoose Model
+          userId: storedId,     // Extra safety for the controller
+          startDate: formData.startDate,
+          endDate: formData.endDate,
+          reason: formData.reason
+        };
         headers = { 'Content-Type': 'application/json' };
       } else {
-        // LEAVE uses FormData for file upload
+        // --- LEAVE PAYLOAD (FormData) ---
         payload = new FormData();
-        payload.append('employeeId', userId);
+        payload.append('employeeId', storedId);
+        payload.append('userId', storedId);
         payload.append('startDate', formData.startDate);
         payload.append('endDate', formData.endDate);
         payload.append('reason', formData.reason);
@@ -69,17 +77,24 @@ export const useForm = (type) => {
         headers = { 'Content-Type': 'multipart/form-data' };
       }
 
+      console.log("DEBUG: Sending Payload:", payload);
+
+      const endpoint = editData 
+        ? (isWFH ? `${API.UPDATE_WFH}/${editData._id}` : `${API.UPDATE_LEAVE}/${editData._id}`)
+        : (isWFH ? API.ADD_WFH : API.ADD_LEAVE);
+
       if (editData) {
-        await axios.put(finalURL, payload, { headers });
+        await axios.put(endpoint, payload, { headers });
       } else {
-        await axios.post(finalURL, payload, { headers });
+        await axios.post(endpoint, payload, { headers });
       }
 
       toast.success(`${type} Request ${editData ? 'Updated' : 'Submitted'} Successfully!`);
       navigate(isWFH ? '/wfh-history' : '/leave-history');
 
     } catch (err) {
-      toast.error(err.response?.data?.message || "Operation failed");
+      console.error("Submission Error Response:", err.response?.data);
+      toast.error(err.response?.data?.message || "Validation Error. Check all fields.");
     } finally {
       setLoading(false);
     }
