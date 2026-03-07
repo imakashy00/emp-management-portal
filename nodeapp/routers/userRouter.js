@@ -1,16 +1,11 @@
 const express = require('express');
-const { 
-  getUserByEmailAndPassword, 
-  getAllEmployees, 
-  addUser, 
-  inviteManager, 
-  verifyManager, 
-  checkEmail, 
+const {
+  getUserByEmailAndPassword,
+  getAllEmployees,
+  addUser,
+  inviteManager,
+  checkEmail,
   resetPassword,
-  addWfhRequest,
-  getWfhRequestsByUserId,
-  updateWfhRequest,
-  deleteWfhRequest
 } = require('../controllers/userController');
 
 const router = express.Router();
@@ -30,6 +25,7 @@ router.get('/getAllEmployees', getAllEmployees);
 router.post('/inviteManager', inviteManager);
 
 module.exports = router;
+
 
 
 
