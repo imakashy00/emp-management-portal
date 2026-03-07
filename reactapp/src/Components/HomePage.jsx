@@ -25,13 +25,6 @@ const HomePage = () => {
           Start today and get one step closer to achieving your work goals.
         </div>
       </div>
-
-      {/* Footer (Ref: Page 30) */}
-      <div className="w-full max-w-4xl mt-12 bg-[#1e293b] text-white p-8 rounded-xl text-center">
-        <h3 className="text-lg font-bold mb-2">Contact Us</h3>
-        <p className="text-xs text-gray-400">Email: support@workbuddy.com</p>
-        <p className="text-xs text-gray-400">Phone: 123-456-7890</p>
-      </div>
     </div>
   );
 };

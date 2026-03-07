@@ -1,17 +1,20 @@
+import React from 'react';
 import { Navigate } from 'react-router-dom';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
-    const role = localStorage.getItem("userRole")?.toLowerCase();
+  // Use .toLowerCase() to avoid "Manager" vs "manager" mismatch
+  const role = localStorage.getItem("userRole")?.toLowerCase();
 
-    if (!role) {
-        return <Navigate to="/login" replace />;
-    }
+  if (!role) {
+    return <Navigate to="/login" replace />;
+  }
 
-    if (!allowedRoles.includes(role)) {
-        return <Navigate to="/error" replace />;
-    }
+  // Ensure allowedRoles is compared against the lowercase role
+  if (!allowedRoles.map(r => r.toLowerCase()).includes(role)) {
+    return <Navigate to="/home" replace />;
+  }
 
-    return children;
+  return children;
 };
 
-export default ProtectedRoute
+export default ProtectedRoute;
