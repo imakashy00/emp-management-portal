@@ -79,13 +79,13 @@ export const useSignup = (token, inviteEmail, navigate) => {
         try {
             const { confirmPassword, ...submitData } = formData;
 
-            const endpoint = token ? API.VERIFY_MANAGER : API.SIGNUP;
+            // const endpoint = token ? API.VERIFY_MANAGER : API.SIGNUP;
 
             const payload = token
                 ? { ...submitData, token }
                 : submitData;
 
-            await axios.post(endpoint, payload);
+            await axios.post(API.SIGNUP, payload);
 
             toast.success(token ? "Manager setup complete! Please login." : "Account created successfully!");
             navigate('/login');
