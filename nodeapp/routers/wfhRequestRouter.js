@@ -1,35 +1,45 @@
 const express = require('express');
 const router = express.Router();
-const { viewWfhRequests, getWfhRequestById, addWfhRequest, updateWfhRequest, deleteWfhRequest, changeWfhStatus, } = require('../controllers/wfhRequestController');
+const { 
+  addWfhRequest, 
+  viewWfhRequests, 
+  updateWfhRequest, 
+  deleteWfhRequest,
+  changeWfhStatus 
+} = require('../controllers/wfhRequestController');
 const { verifyJWT, validateRole } = require('../middlewares/auth');
 const upload = require('../middlewares/upload');
 
-
-// All WFH routes require valid login
+// All WFH routes require authentication
 router.use(verifyJWT);
 
-// Shared View Routes
-router.get('/', viewWfhRequests);
-router.get('/:id', getWfhRequestById);
+/**
+ * GET /api/wfhRequests/:employeeId
+ * Parameters: page, limit, search, status
+ */
+router.get('/:employeeId', viewWfhRequests);
 
-// Note: 'file' inside upload.single('file') must match the Key name in Postman/Frontend
-router.post(
-    '/',
-    validateRole('employee'),
-    upload.single('file'),
-    addWfhRequest
-);
+/**
+ * POST /api/wfhRequests
+ * Requirement: Role 'employee', supports file upload
+ */
+router.post('/', validateRole('employee'), upload.single('file'), addWfhRequest);
 
-router.put(
-    '/:id',
-    validateRole('employee'),
-    upload.single('file'),
-    updateWfhRequest
-);
+/**
+ * PUT /api/wfhRequests/:id
+ * Requirement: Role 'employee', only if status is Pending
+ */
+router.put('/:id', validateRole('employee'), upload.single('file'), updateWfhRequest);
 
-router.delete('/:id', validateRole('employee','manager'), deleteWfhRequest);
+/**
+ * DELETE /api/wfhRequests/:id
+ */
+router.delete('/:id', deleteWfhRequest);
 
-// Manager Only
+/**
+ * PATCH /api/wfhRequests/:id/status
+ * Requirement: Role 'manager'
+ */
 router.patch('/:id/status', validateRole('manager'), changeWfhStatus);
 
 module.exports = router;
