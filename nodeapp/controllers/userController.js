@@ -6,10 +6,6 @@ const { generateToken } = require('../middleware/auth');
 const sendManagerInvite = require('../services/sendMail');
 const messages = require('../errorMessages/controllerError.json');
 
-// =========================================================
-// 1. AUTHENTICATION & USER MANAGEMENT
-// =========================================================
-
 const getUserByEmailAndPassword = async (req, res) => {
   try {
     const { email, password } = req.body;

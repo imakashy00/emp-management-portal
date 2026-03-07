@@ -11,15 +11,14 @@ const swaggerSpec = require('./config/swagger');
 
 const app = express();
 
-// Use PORT from .env or default to 8080
-const port = process.env.port || 8080;
+const port = process.env.port;
 
 // Connecting to Database
 connectDB();
 
 // Middleware
 app.use(cors(corsOptions));
-app.use(express.json()); // CRUCIAL for reading WFH JSON data
+app.use(express.json()); 
 app.use(express.urlencoded({ extended: false }));
 
 // Documentation
@@ -35,9 +34,8 @@ app.get('/', (req, res) => {
 });
 
 // Routes
-// Note: Based on your apiConfig.js, WFH requests hit /api/users/addWfhRequest
 app.use('/api/users', userRouter); 
-app.use('/api/leaveRequests', leaveRequest);
+app.use('/api/leavesRequests', leaveRequest);
 app.use('/api/wfhRequest', wfhRequest);
 
 app.listen(port, () => {
