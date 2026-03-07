@@ -2,7 +2,7 @@ const User = require('../models/userModel');
 const crypto = require('node:crypto');
 const bcrypt = require('bcrypt');
 const ManagerInvites = require('../models/managerInvites');
-const { generateToken } = require('../middleware/auth');
+const { generateToken } = require('../middlewares/auth');
 const sendManagerInvite = require('../services/sendMail');
 const messages = require('../errorMessages/controllerError.json');
 
@@ -136,7 +136,6 @@ module.exports = {
   getUserByEmailAndPassword,
   addUser,
   getAllEmployees,
-  deleteUser,
   inviteManager,
   checkEmail,
   resetPassword,

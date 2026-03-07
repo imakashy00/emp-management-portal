@@ -2,35 +2,39 @@ const mongoose = require('mongoose');
 const messages = require('../errorMessages/modelError.json');
 
 const wfhRequestSchema = new mongoose.Schema({
-  employeeId: { 
-    type: mongoose.Schema.Types.ObjectId, 
+  employeeId: {
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, messages.wfh.employeeId] 
+    required: [true, messages.wfh.employeeId]
   },
-  startDate: { 
-    type: Date, 
-    required: [true, messages.wfh.startDate.required] 
+  startDate: {
+    type: Date,
+    required: [true, messages.wfh.startDate.required]
   },
-  endDate: { 
-    type: Date, 
+  endDate: {
+    type: Date,
     required: [true, messages.wfh.endDate.required],
     validate: {
-      validator: function(value) { return value >= this.startDate; },
+      validator: function (value) { return value >= this.startDate; },
       message: messages.wfh.endDate.invalid
     }
   },
-  reason: { 
-    type: String, 
+  reason: {
+    type: String,
     required: [true, messages.wfh.reason.required],
     minlength: [10, messages.wfh.reason.minLength]
   },
-  status: { 
-    type: String, 
+  file: {
+    type: String,
+    default: null,
+  },
+  status: {
+    type: String,
     enum: {
       values: ['Pending', 'Approved', 'Rejected'],
       message: messages.wfh.status.enum
     },
-    default: 'Pending' 
+    default: 'Pending'
   }
 }, { timestamps: true });
 

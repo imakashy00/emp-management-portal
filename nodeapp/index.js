@@ -24,9 +24,6 @@ app.use(express.urlencoded({ extended: false }));
 // Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.get('/api/users/getAllEmployees', (req, res) => {
-    res.json([{ id: "1", userName: "Alice", email: "alice@work.com", role: "employee" }]);
-});
 
 // Base route
 app.get('/', (req, res) => {
