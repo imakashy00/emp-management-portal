@@ -3,7 +3,8 @@ const crypto = require('node:crypto');
 const bcrypt = require('bcrypt');
 const ManagerInvites = require('../models/managerInvites');
 const { generateToken } = require('../middlewares/auth');
-const sendManagerInvite = require('../services/sendMail');
+const { sendManagerInvite, sendPasswordResetOTP } = require('../services/sendMail');
+const PasswordReset = require('../models/passwordReset');
 
 // Import both error message files
 const messages = require('../errorMessages/controllerError.json');
@@ -23,16 +24,16 @@ const getUserByEmailAndPassword = async (req, res) => {
     if (!isMatch) return res.status(401).json({ message: messages.auth.invalid });
 
     const token = generateToken(user.userName, user._id, user.role, user.email);
-    return res.status(200).json({ 
-      userName: user.userName, 
-      role: user.role, 
-      token, 
-      id: user._id 
+    return res.status(200).json({
+      userName: user.userName,
+      role: user.role,
+      token,
+      id: user._id
     });
   } catch (error) {
-    
+
     return res.status(500).json({ message: messages.common.serverError });
-    
+
   }
 };
 
@@ -56,7 +57,7 @@ const addUser = async (req, res) => {
       if (!inviteRecord) {
         return res.status(403).json({ message: messages.auth.tokenExpired });
       }
-      assignedRole = 'manager'; 
+      assignedRole = 'manager';
     } else {
       const existing = await User.findOne({ email: normalizedEmail });
       if (existing) {
@@ -106,27 +107,58 @@ const checkEmail = async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ message: modelMessages.user.email.required });
 
-    const user = await User.findOne({ email: email.trim().toLowerCase() });
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // 1. Check if user exists
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) return res.status(404).json({ message: messages.password.emailNotFound });
-    
-    return res.status(200).json({ message: messages.password.emailVerified });
+
+    // 2. Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // 3. Save OTP to database (Updates if exists, creates if not)
+    await PasswordReset.findOneAndUpdate(
+      { email: normalizedEmail },
+      { otp, createdAt: new Date() },
+      { upsert: true, new: true }
+    );
+
+    // 4. Send the OTP via Email
+    await sendPasswordResetOTP(normalizedEmail, otp);
+
+    return res.status(200).json({ message: "OTP sent successfully to your email." });
   } catch (error) {
+    console.error("CheckEmail Error:", error);
     return res.status(500).json({ message: messages.common.serverError });
   }
 };
 
 const resetPassword = async (req, res) => {
   try {
-    const { email, newPassword } = req.body;
+    const { email, otp, newPassword } = req.body;
+    const normalizedEmail = email.trim().toLowerCase();
 
-    // Validate new password length before hashing
+    // 1. Validate new password length
     if (!newPassword || newPassword.length < 8) {
       return res.status(400).json({ message: modelMessages.user.password.minLength });
     }
 
+    // 2. Verify the OTP from the PasswordReset collection
+    const resetRecord = await PasswordReset.findOne({
+      email: normalizedEmail,
+      otp: otp
+    });
+
+    if (!resetRecord) {
+      return res.status(400).json({ message: "Invalid or expired OTP code." });
+    }
+
+    // 3. Hash the new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // 4. Update the User's password
     const updatedUser = await User.findOneAndUpdate(
-      { email: email.trim().toLowerCase() }, 
+      { email: normalizedEmail },
       { password: hashedPassword }
     );
 
@@ -134,8 +166,12 @@ const resetPassword = async (req, res) => {
       return res.status(404).json({ message: messages.password.emailNotFound });
     }
 
+    // 5. Success! Delete the OTP record so it cannot be used again
+    await PasswordReset.deleteOne({ _id: resetRecord._id });
+
     return res.status(200).json({ message: messages.password.resetSuccess });
   } catch (error) {
+    console.error("ResetPassword Error:", error);
     return res.status(500).json({ message: messages.common.serverError });
   }
 };
@@ -220,8 +256,8 @@ const getAllEmployees = async (req, res) => {
 
   } catch (error) {
     console.error('Error fetching employees:', error);
-    return res.status(500).json({ 
-      message: messages.user?.fetchError || "Failed to fetch employee records" 
+    return res.status(500).json({
+      message: messages.user?.fetchError || "Failed to fetch employee records"
     });
   }
 };

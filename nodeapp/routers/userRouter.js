@@ -26,7 +26,3 @@ router.get('/employees', getAllEmployees);
 router.post('/inviteManager', inviteManager);
 
 module.exports = router;
-
-
-
-

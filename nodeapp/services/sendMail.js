@@ -3,23 +3,20 @@ const nodemailer = require('nodemailer');
 const GMAIL_USER = process.env.GMAIL_USER;
 const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
 
-console.log(GMAIL_USER)
-console.log(GMAIL_APP_PASSWORD)
-// 1. Setup the Transport (The engine)
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: GMAIL_USER, 
-        pass: GMAIL_APP_PASSWORD // 16-character 
+        pass: GMAIL_APP_PASSWORD 
     },
     debug: true, 
     logger: true 
 });
 
+// EXISTING FUNCTION (Kept exactly as is)
 const sendManagerInvite = async (email, token) => {
-    const inviteLink = `https://8081-ecdceceebbabefefcfccffeabf.premiumproject.examly.io/register-manager?token=${token}&email=${email}`;
+    const inviteLink = `https://8081-aceeaaadefefcfccffeabf.premiumproject.examly.io/register-manager?token=${token}&email=${email}`;
     
-    // 2. Define the Message
     const mailOptions = {
         from: `"HR Management" <${GMAIL_USER}>`,
         to: email,
@@ -35,7 +32,6 @@ const sendManagerInvite = async (email, token) => {
     };
 
     try {
-        // 3. Send the Mail
         const info = await transporter.sendMail(mailOptions);
         console.log(`Invite sent to ${email}. MessageId: ${info.messageId}`);
     } catch (error) {
@@ -44,4 +40,38 @@ const sendManagerInvite = async (email, token) => {
     }
 };
 
-module.exports = sendManagerInvite;
+// NEW FUNCTION: For Password Reset OTP
+const sendPasswordResetOTP = async (email, otp) => {
+    const mailOptions = {
+        from: `"HR Management" <${GMAIL_USER}>`,
+        to: email,
+        subject: 'Your Password Reset Code',
+        html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+            <h2 style="color: #1C4587; text-align: center;">WorkBuddy Password Recovery</h2>
+            <p>Hello,</p>
+            <p>You requested a password reset. Please use the 6-digit verification code below to proceed:</p>
+            <div style="text-align: center; margin: 30px 0;">
+                <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #3C78D8; background: #f4f7f6; padding: 10px 20px; border-radius: 5px; border: 1px dashed #3C78D8;">
+                    ${otp}
+                </span>
+            </div>
+            <p style="color: #666; font-size: 12px;">This code is valid for 10 minutes. If you did not request this, please ignore this email.</p>
+        </div>
+      `,
+    };
+
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`OTP sent to ${email}. MessageId: ${info.messageId}`);
+    } catch (error) {
+        console.error('Nodemailer Error (OTP):', error.message);
+        throw new Error('Failed to send OTP email');
+    }
+};
+
+// Export both functions so they can be used individually
+module.exports = {
+    sendManagerInvite,
+    sendPasswordResetOTP
+};
