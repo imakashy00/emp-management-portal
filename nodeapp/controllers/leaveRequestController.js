@@ -1,73 +1,79 @@
 const LeaveRequest = require("../models/leaveRequestModel");
 
-
-const addLeaveRequest = async (req, res) => {
+// CREATE: New requests default to 'Pending' in the Schema
+exports.addLeaveRequest = async (req, res) => {
   try {
-    const { employeeId, userId, startDate, endDate, reason, leaveType } = req.body;
-    const finalId = employeeId || userId;
+    const { employeeId, startDate, endDate, reason, leaveType } = req.body;
+    const file = req.file ? req.file.filename : null;
 
-    if (!finalId) return res.status(400).json({ message: "Employee ID is required" });
-
-    // Multer attaches the file info to req.file
-    const fileName = req.file ? req.file.filename : null;
-
-    const newLeave = await LeaveRequest.create({
-      employeeId: finalId,
-      startDate,
-      endDate,
-      reason,
-      leaveType,
-      file: fileName, // Stores only the filename string in MongoDB
-      status: 'Pending'
+    const newReq = await LeaveRequest.create({
+      employeeId, startDate, endDate, reason, leaveType, file
     });
-
-    return res.status(200).json({ message: "Success", data: newLeave });
+    res.status(200).json({ message: "Leave Request Submitted", data: newReq });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
-// ... keep other functions (update/delete/get) as they were
-
-const getLeaveRequestsByUserId = async (req, res) => {
+// READ: Paginated fetch
+exports.getLeaveRequestsByUserId = async (req, res) => {
   try {
-    const requests = await LeaveRequest.find({ employeeId: req.params.userId }).sort({ createdAt: -1 });
-    return res.status(200).json(requests);
+    const { employeeId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+    const search = req.query.search || "";
+
+    const query = { employeeId, reason: { $regex: search, $options: "i" } };
+    const total = await LeaveRequest.countDocuments(query);
+    const data = await LeaveRequest.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit);
+
+    res.status(200).json({ total, pages: Math.ceil(total / limit), data });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
-const updateLeaveRequest = async (req, res) => {
+// UPDATE: Only allowed if status is 'Pending'
+exports.updateLeaveRequest = async (req, res) => {
   try {
-    const { startDate, endDate, reason, leaveType } = req.body;
     const leave = await LeaveRequest.findById(req.params.id);
+    if (!leave) return res.status(404).json({ message: "Request not found" });
 
-    if (!leave) return res.status(404).json({ message: "Leave Request not found" });
-
-    leave.startDate = startDate;
-    leave.endDate = endDate;
-    leave.reason = reason;
-    leave.leaveType = leaveType;
-
-    // If a new file is uploaded during edit, update the reference
+    // --- SECURITY CHECK: Status must be Pending ---
+    if (leave.status !== 'Pending') {
+      return res.status(400).json({ 
+        message: "Action denied: You can only update requests that are in 'Pending' status." 
+      });
+    }
+    
+    // Apply updates
+    Object.assign(leave, req.body);
     if (req.file) leave.file = req.file.filename;
-
-    await leave.save();
-    return res.status(200).json({ message: "Leave Request updated successfully", data: leave });
+    
+    await leave.save(); // Triggers Schema validation
+    res.status(200).json({ message: "Updated Successfully" });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
-const deleteLeaveRequest = async (req, res) => {
+// DELETE: Only allowed if status is 'Pending'
+exports.deleteLeaveRequest = async (req, res) => {
   try {
-    const deleted = await LeaveRequest.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ message: "Leave Request not found" });
-    return res.status(200).json({ message: "Leave Request deleted successfully" });
+    const leave = await LeaveRequest.findById(req.params.id);
+    if (!leave) return res.status(404).json({ message: "Request not found" });
+
+    // --- SECURITY CHECK: Status must be Pending ---
+    if (leave.status !== 'Pending') {
+      return res.status(400).json({ 
+        message: "Action denied: You cannot delete a request that has already been processed." 
+      });
+    }
+
+    await LeaveRequest.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: "Deleted Successfully" });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
-
-module.exports = { addLeaveRequest, deleteLeaveRequest, updateLeaveRequest, getLeaveRequestsByUserId }

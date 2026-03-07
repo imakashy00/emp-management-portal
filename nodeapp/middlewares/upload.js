@@ -1,33 +1,29 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const express = require('express'); // Added express import
 
-// Define the upload directory
 const uploadDir = 'uploads';
 
-// Auto-create uploads folder if it doesn't exist
+// Auto-create uploads folder
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir);
     console.log("✅ Created 'uploads' directory.");
 }
 
-// Storage Configuration
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, uploadDir + '/');
     },
     filename: (req, file, cb) => {
-        // Creates a unique filename: timestamp-originalName
         const uniqueSuffix = Date.now() + '-' + file.originalname.replace(/\s+/g, '_');
         cb(null, uniqueSuffix);
     }
 });
 
-// File filter (Optional: restrict to images/PDFs)
 const fileFilter = (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|pdf/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-
     if (extname) {
         return cb(null, true);
     } else {
@@ -37,8 +33,15 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // Limit 5MB
+    limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: fileFilter
 });
+
+// --- NEW HELPER FOR INDEX.JS ---
+// This function handles the "index.js thing" (serving the files)
+upload.setupStaticServing = (app) => {
+    app.use('/uploads', express.static(path.join(__dirname, '..', uploadDir)));
+    console.log("📂 Static file serving initialized for /uploads");
+};
 
 module.exports = upload;

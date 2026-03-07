@@ -10,17 +10,14 @@ export const useForm = (type) => {
   const editData = location.state?.editData;
 
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
-    startDate: '',
-    endDate: '',
-    reason: '',
-    leaveType: 'Sick Leave',
-    file: null
+    startDate: '', endDate: '', reason: '', leaveType: 'Sick Leave', file: null
   });
 
   useEffect(() => {
     if (editData) {
-      const formatDate = (dateStr) => new Date(dateStr).toISOString().split('T')[0];
+      const formatDate = (d) => new Date(d).toISOString().split('T')[0];
       setFormData({
         startDate: formatDate(editData.startDate),
         endDate: formatDate(editData.endDate),
@@ -33,36 +30,33 @@ export const useForm = (type) => {
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === 'file') {
-      setFormData({ ...formData, file: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    setFormData({ ...formData, [name]: files ? files[0] : value });
+    if (errors[name]) setErrors({ ...errors, [name]: '' });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Field Validation
+    if (!formData.startDate || !formData.endDate || !formData.reason) {
+      return toast.warn("Please fill all mandatory fields");
+    }
+    if (formData.reason.length < 10) {
+      return toast.warn("Reason must be at least 10 characters");
+    }
+
     setLoading(true);
-
     try {
-      const storedId = localStorage.getItem('userId');
-      if (!storedId) return toast.error("Session expired. Please Login.");
-
+      const employeeId = localStorage.getItem('userId');
       const isWFH = type === 'WFH';
-      let payload;
-      let headers = {};
+      let payload, headers = {};
 
       if (isWFH) {
-        payload = {
-          employeeId: storedId,
-          startDate: formData.startDate,
-          endDate: formData.endDate,
-          reason: formData.reason
-        };
+        payload = { ...formData, employeeId };
         headers = { 'Content-Type': 'application/json' };
       } else {
         payload = new FormData();
-        payload.append('employeeId', storedId);
+        payload.append('employeeId', employeeId);
         payload.append('startDate', formData.startDate);
         payload.append('endDate', formData.endDate);
         payload.append('reason', formData.reason);
@@ -71,25 +65,20 @@ export const useForm = (type) => {
         headers = { 'Content-Type': 'multipart/form-data' };
       }
 
-      const endpoint = editData 
-        ? (isWFH ? `${API.UPDATE_WFH}/${editData._id}` : `${API.UPDATE_LEAVE}/${editData._id}`)
-        : (isWFH ? API.ADD_WFH : API.ADD_LEAVE);
+      const baseUrl = isWFH ? API.ADD_WFH : API.ADD_LEAVE;
+      const endpoint = editData ? `${baseUrl}/${editData._id}` : baseUrl;
 
-      if (editData) {
-        await axios.put(endpoint, payload, { headers });
-      } else {
-        await axios.post(endpoint, payload, { headers });
-      }
+      if (editData) await axios.put(endpoint, payload, { headers });
+      else await axios.post(endpoint, payload, { headers });
 
-      toast.success(`${type} Request ${editData ? 'Updated' : 'Submitted'} Successfully!`);
+      toast.success(`${type} Request Successful!`);
       navigate(isWFH ? '/wfh-history' : '/leave-history');
-
     } catch (err) {
-      toast.error(err.response?.data?.message || "Validation Error. Check all fields.");
+      toast.error(err.response?.data?.message || "Server Error");
     } finally {
       setLoading(false);
     }
   };
 
-  return { formData, loading, handleInputChange, handleSubmit, isEdit: !!editData };
+  return { formData, loading, errors, handleInputChange, handleSubmit, isEdit: !!editData };
 };
