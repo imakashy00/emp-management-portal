@@ -4,89 +4,35 @@ const WfhRequest = require("../models/wfhRequestModel");
 
 const messages = require('../errorMessages/controllerError.json');
 
-// Basic Pagination (Page 2, 5 items per page):
-// GET /api/wfhRequest?page=2&limit=5
-// Filter by Status (Pending only):
-// GET /api/wfhRequest?status=Pending
-// Search by Reason (Searching for "medical"):
-// GET /api/wfhRequest?reason=medical
-// Search by Date Range:
-// GET /api/wfhRequest?startDate=2023-01-01&endDate=2023-12-31
-// Combining everything:
-// GET /api/wfhRequest?status=Approved&reason=family&page=1&limit=10
-
 const viewWfhRequests = async (req, res) => {
   try {
-    // 1. Get query parameters with default values for pagination
-    const {
-      page = 1,
-      limit = 10,
-      status,
-      reason,
-      startDate,
-      endDate
-    } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+    const search = req.query.search || "";
 
-    // 2. Build the Search/Filter Object
-    let query = {};
-
-    // --- RBAC: Restrict data based on role ---
+    // Build Query: Managers see all, Employees see only theirs
+    let query = { reason: { $regex: search, $options: 'i' } };
     if (req.user.role !== 'manager') {
-      // Employees only see their own requests
       query.employeeId = req.user.id;
     }
 
-    // --- Search by Status (Exact Match) ---
-    if (status) {
-      query.status = status;
-    }
+    const total = await WfhRequest.countDocuments(query);
+    const data = await WfhRequest.find(query)
+      .populate('employeeId', 'userName email')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    // --- Search by Reason (Partial match, case-insensitive) ---
-    if (reason) {
-      query.reason = { $regex: reason, $options: 'i' };
-    }
-
-    // --- Search by Date Range ---
-    // This finds requests where the startDate falls between the provided range
-    if (startDate || endDate) {
-      query.startDate = {};
-      if (startDate) query.startDate.$gte = new Date(startDate); // Start date greater than or equal to
-      if (endDate) query.startDate.$lte = new Date(endDate);     // Start date less than or equal to
-    }
-
-    // 3. Execute Pagination logic
-    const skip = (parseInt(page) - 1) * parseInt(limit);
-
-    // 4. Fetch data and count total for frontend metadata
-    const [requests, totalDocs] = await Promise.all([
-      WfhRequest.find(query)
-        .populate('employeeId', 'userName email') // Get user details
-        .sort({ createdAt: 1 })                  // Oldest first
-        .skip(skip)
-        .limit(parseInt(limit)),
-      WfhRequest.countDocuments(query)            // Get total count for the filter
-    ]);
-
-    // 5. Send Response with metadata
     res.status(200).json({
-      success: true,
-      data: requests,
-      pagination: {
-        totalItems: totalDocs,
-        totalPages: Math.ceil(totalDocs / limit),
-        currentPage: parseInt(page),
-        limit: parseInt(limit)
-      }
+      total,
+      pages: Math.ceil(total / limit),
+      data: data
     });
-
   } catch (error) {
-    console.error('Error fetching WFH:', error);
-    res.status(500).json({
-      message: messages.wfh.fetchError
-    });
+    res.status(500).json({ message: messages.wfh.fetchError });
   }
 };
-
 
 const getWfhRequestById = async (req, res) => {
   try {

@@ -7,21 +7,20 @@ import Button from '../Components/Button';
 const Form = ({ type = 'WFH' }) => {
   const { formData, loading, errors, handleInputChange, handleSubmit, isEdit } = useForm(type);
   const isLeave = type === 'LEAVE';
-
-  // Get Today for date restrictions
   const today = new Date().toISOString().split('T')[0];
 
   return (
     <div className="flex-1 flex items-center justify-center p-4 min-h-screen bg-[#f4f7f6]">
       <div className="w-full max-w-[600px] bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+        
         <div className="bg-[#1C4587] p-8 text-center relative">
-          <div className="absolute top-4 right-4 opacity-10 text-white">
+          <div className="absolute top-4 right-4 opacity-10 text-white pointer-events-none">
             {isLeave ? <Activity size={80} /> : <Briefcase size={80} />}
           </div>
           <h2 className="text-2xl font-bold text-white uppercase tracking-widest relative z-10">
             {isEdit ? 'Update' : 'Apply'} {isLeave ? 'Leave' : 'WFH'} Request
           </h2>
-          <div className="w-16 h-1.5 bg-[#FFD966] mx-auto mt-3 rounded-full relative z-10"></div>
+          <div className="w-16 h-1.5 bg-[#FFD966] mx-auto mt-3 rounded-full relative z-10 shadow-sm"></div>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6" noValidate>
@@ -30,7 +29,7 @@ const Form = ({ type = 'WFH' }) => {
               label="Start Date *"
               name="startDate"
               type="date"
-              min={today} // Disable previous dates
+              min={today} 
               value={formData.startDate}
               onChange={handleInputChange}
               error={errors.startDate}
@@ -39,7 +38,7 @@ const Form = ({ type = 'WFH' }) => {
               label="End Date *"
               name="endDate"
               type="date"
-              min={formData.startDate || today} // Disable dates before start date
+              min={formData.startDate || today} 
               value={formData.endDate}
               onChange={handleInputChange}
               error={errors.endDate}
@@ -64,10 +63,10 @@ const Form = ({ type = 'WFH' }) => {
           )}
 
           <Input 
-            label="Reason / Diagnosis *" 
+            label="Reason *" 
             name="reason" 
             type="text" 
-            placeholder="Min 10 characters required..."
+            placeholder="Detailed description..."
             className="font-normal"
             value={formData.reason} 
             onChange={handleInputChange} 
@@ -87,7 +86,7 @@ const Form = ({ type = 'WFH' }) => {
           )}
 
           <div className="pt-4">
-            <Button type="submit" loading={loading} className="w-full bg-[#1C4587] hover:bg-[#153669] text-white py-4 rounded-xl font-bold uppercase text-xs shadow-lg">
+            <Button type="submit" loading={loading} className="w-full bg-[#1C4587] hover:bg-[#153669] text-white py-4 rounded-xl font-bold uppercase text-xs tracking-widest shadow-lg transform active:scale-95 transition-all">
               <div className="flex items-center justify-center gap-2">
                 <FileText size={18} />
                 <span>{isEdit ? `Update ${type} Request` : `Submit ${type} Request`}</span>

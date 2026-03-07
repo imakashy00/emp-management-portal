@@ -9,7 +9,7 @@ const Input = ({ label, icon: Icon, error, className = "", ...props }) => {
         </label>
       )}
       <div className="relative flex items-center">
-        {/* Lucide icon is hidden for dates to prevent double icons */}
+        {/* Only show Icon if it is NOT a date type to prevent double icons */}
         {Icon && props.type !== 'date' && (
           <Icon className="absolute left-0 text-gray-400 group-focus-within:text-[#1C4587] transition-colors w-4 h-4" />
         )}
