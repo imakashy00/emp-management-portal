@@ -23,22 +23,22 @@ const getUserByEmailAndPassword = async (req, res) => {
     if (!isMatch) return res.status(401).json({ message: messages.auth.invalid });
 
     const token = generateToken(user.userName, user._id, user.role, user.email);
-    return res.status(200).json({ 
-      userName: user.userName, 
-      role: user.role, 
-      token, 
-      id: user._id 
+    return res.status(200).json({
+      userName: user.userName,
+      role: user.role,
+      token,
+      id: user._id
     });
   } catch (error) {
-    
+
     return res.status(500).json({ message: messages.common.serverError });
-    
+
   }
 };
 
 const addUser = async (req, res) => {
   try {
-    const { userName, email, password, mobile, role, token } = req.body;
+    let { userName, email, password, mobile, role, token } = req.body;
     const normalizedEmail = email.toLowerCase();
 
     // --- MANUAL PASSWORD VALIDATION (Crucial for Bcrypt) ---
@@ -56,7 +56,7 @@ const addUser = async (req, res) => {
       if (!inviteRecord) {
         return res.status(403).json({ message: messages.auth.tokenExpired });
       }
-      assignedRole = 'manager'; 
+      role = 'manager';
     } else {
       const existing = await User.findOne({ email: normalizedEmail });
       if (existing) {
@@ -71,7 +71,8 @@ const addUser = async (req, res) => {
       userName,
       email: normalizedEmail,
       password: hashedPassword,
-      mobile
+      mobile,
+      role
     });
 
     if (inviteRecord) {
@@ -108,7 +109,7 @@ const checkEmail = async (req, res) => {
 
     const user = await User.findOne({ email: email.trim().toLowerCase() });
     if (!user) return res.status(404).json({ message: messages.password.emailNotFound });
-    
+
     return res.status(200).json({ message: messages.password.emailVerified });
   } catch (error) {
     return res.status(500).json({ message: messages.common.serverError });
@@ -126,7 +127,7 @@ const resetPassword = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     const updatedUser = await User.findOneAndUpdate(
-      { email: email.trim().toLowerCase() }, 
+      { email: email.trim().toLowerCase() },
       { password: hashedPassword }
     );
 
@@ -220,8 +221,8 @@ const getAllEmployees = async (req, res) => {
 
   } catch (error) {
     console.error('Error fetching employees:', error);
-    return res.status(500).json({ 
-      message: messages.user?.fetchError || "Failed to fetch employee records" 
+    return res.status(500).json({
+      message: messages.user?.fetchError || "Failed to fetch employee records"
     });
   }
 };
