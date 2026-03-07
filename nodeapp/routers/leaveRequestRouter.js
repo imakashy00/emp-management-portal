@@ -5,8 +5,17 @@ const {
   addLeaveRequest,
   getLeaveRequestsByUserId,
   deleteLeaveRequest,
-  updateLeaveRequest
+  updateLeaveRequest,
+  getManagerLeaveRequests, // Import new
+  changeLeaveStatus   
 } = require('../controllers/leaveRequestController');
+const { verifyJWT, validateRole } = require('../middlewares/auth'); 
+router.use(verifyJWT); 
+
+router.get('/', validateRole('manager'), getManagerLeaveRequests);
+
+// MANAGER: Update Status
+router.patch('/:id/status', validateRole('manager'), changeLeaveStatus);
 
 // Standardized routes
 router.post('/', upload.single('file'), addLeaveRequest);
