@@ -11,6 +11,11 @@
     "addSuccess": "User added Successfully",
     "fetchError": "Error retrieving employees"
   },
+  "password": {
+    "emailNotFound": "Email not found in our records",
+    "emailVerified": "Email verified",
+    "resetSuccess": "Password updated successfully"
+  },
   "manager": {
     "inviteSuccess": "Invitation sent successfully!",
     "verifySuccess": "Manager account verified and created"
@@ -36,6 +41,7 @@
     "deleteSuccess": "WFH request deleted successfully"
   },
   "common": {
-    "serverError": "Internal Server Error"
+    "serverError": "Internal Server Error",
+    "duplicate": "This entry is already taken"
   }
 }
