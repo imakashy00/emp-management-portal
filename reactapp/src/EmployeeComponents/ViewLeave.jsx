@@ -20,8 +20,13 @@ const ViewLeave = () => {
   const fetchRequests = async () => {
     try {
       const employeeId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
       const url = `${API.GET_LEAVE_BY_USER}/${employeeId}?page=${currentPage}&limit=${limit}&search=${searchTerm}`;
-      const response = await axios.get(url);
+      const response = await axios.get(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (response.data && response.data.data) {
         setRequests(response.data.data);
         setTotalPages(response.data.pages || 1);
@@ -42,7 +47,7 @@ const ViewLeave = () => {
   return (
     <div className="p-8 bg-[#f4f7f6] min-h-screen font-['Segoe_UI',sans-serif]">
       <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-8 border border-gray-100">
-        
+
         <div className="flex justify-between items-center mb-8 border-b pb-6">
           <div>
             <h2 className="text-2xl font-bold text-[#1C4587] uppercase tracking-tight">My Leave History</h2>
