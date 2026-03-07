@@ -20,6 +20,8 @@ router.put('/reset-password', resetPassword);
 
 // Employees
 router.get('/getAllEmployees', getAllEmployees);
+router.get('/employees', getAllEmployees);
+router.delete('/employees/:id', deleteUser); 
 
 // Manager Invitations
 router.post('/inviteManager', inviteManager);

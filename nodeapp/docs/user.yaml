@@ -12,6 +12,8 @@
 #       responses:
 #         200:
 #           description: User added Successfully
+#         400:
+#           description: Invalid input data
 
 #   /api/users/login:
 #     post:
@@ -26,6 +28,15 @@
 #       responses:
 #         200:
 #           description: Login successful
+#           content:
+#             application/json:
+#               schema:
+#                 type: object
+#                 properties:
+#                   token:
+#                     type: string
+#         401:
+#           description: Unauthorized
 
 #   /api/users/check-email:
 #     post:
@@ -39,6 +50,7 @@
 #               properties:
 #                 email: 
 #                   type: string
+#                   example: user@example.com
 #       responses:
 #         200:
 #           description: Email verified
@@ -64,4 +76,12 @@
 #         - bearerAuth: []
 #       responses:
 #         200:
-#           description: List returned
+#           description: List of employees returned successfully
+#           content:
+#             application/json:
+#               schema:
+#                 type: array
+#                 items:
+#                   $ref: '#/components/schemas/EmployeeResponse'
+#         403:
+#           description: Forbidden (Manager access only)

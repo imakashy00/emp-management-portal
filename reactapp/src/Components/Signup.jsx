@@ -44,7 +44,6 @@ const Signup = () => {
           </p>
         </div>
 
-        {/* Right Side: Form */}
         <div className="flex-[1.6] p-8 flex flex-col justify-center bg-white">
           <h2 className="text-2xl font-bold text-[#333] mb-1">
             {isManagerInvited ? "Manager Setup" : "Create Account"}
