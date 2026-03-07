@@ -7,7 +7,10 @@ const leaveRequestSchema = new mongoose.Schema({
         ref: 'User',
         required: [true, messages.leave.employeeId]
     },
-    startDate: { type: Date, required: [true, messages.leave.startDate.required] },
+    startDate: {
+        type: Date,
+        required: [true, messages.leave.startDate.required]
+    },
     endDate: {
         type: Date,
         required: [true, messages.leave.endDate.required],
@@ -25,7 +28,6 @@ const leaveRequestSchema = new mongoose.Schema({
         type: String,
         required: [true, messages.leave.leaveType.required],
         enum: {
-            // MUST include 'PTO' exactly like this
             values: ['Sick Leave', 'Casual Leave', 'PTO', 'Vacation'],
             message: "{VALUE} is not a valid leave type"
         }
