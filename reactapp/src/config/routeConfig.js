@@ -1,6 +1,6 @@
 import ForgotPassword from "../Components/ForgotPassword";
-import Login from "../Components/Login";
-import Signup from "../Components/Signup";
+import Login from "../Pages/Login";
+import Signup from "../Pages/Signup";
 import LeaveForm from "../EmployeeComponents/LeaveForm";
 import ViewLeave from "../EmployeeComponents/ViewLeave";
 import ViewWfh from "../EmployeeComponents/ViewWfh";
@@ -8,14 +8,15 @@ import WfhForm from "../EmployeeComponents/WfhForm";
 import EmployeeList from '../ManagerComponents/EmployeeList';
 import LeaveRequest from '../ManagerComponents/LeaveRequest';
 import WfhRequest from '../ManagerComponents/WfhRequest';
-import Home from "../Pages/Home"; // Import Home here
+import Home from "../Components/Dashboard";
 import ManagerInvitation from "../Components/ManagerInvitation";
+import Profile from "../Pages/Profile";
 
 export const publicRoutes = [
     { path: '/login', element: <Login /> },
     { path: '/signup', element: <Signup /> },
     { path: '/forgot-password', element: <ForgotPassword /> },
-    { path: '/register-manager', element: <Signup />},
+    { path: '/register-manager', element: <Signup /> },
 ];
 
 export const protectedRoutes = [
@@ -28,4 +29,5 @@ export const protectedRoutes = [
     { path: 'manager/wfh', element: <WfhRequest />, roles: ['manager'] },
     { path: 'manager/leave', element: <LeaveRequest />, roles: ['manager'] },
     { path: 'invite-manager', element: <ManagerInvitation />, roles: ['manager'] },
+    { path: 'profile', element: <Profile />, roles: ['manager', 'employee'] },
 ];

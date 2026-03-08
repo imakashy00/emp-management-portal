@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const WfhRequest = require("../models/wfhRequestModel");
 const messages = require('../errorMessages/controllerError.json');
+const User = require('../models/userModel');
 
 // READ: Paginated fetch (Standardized to match Leave controller)
 const viewWfhRequests = async (req, res) => {
@@ -26,6 +27,7 @@ const viewWfhRequests = async (req, res) => {
       data: requests
     });
   } catch (error) {
+    console.log('Error:', error)
     res.status(500).json({ message: messages.wfh.fetchError });
   }
 };
@@ -165,11 +167,11 @@ const getManagerWfhRequests = async (req, res) => {
   }
 };
 
-module.exports = { 
-    viewWfhRequests, 
-    addWfhRequest, 
-    updateWfhRequest, 
-    deleteWfhRequest, 
-    changeWfhStatus,
-    getManagerWfhRequests
+module.exports = {
+  viewWfhRequests,
+  addWfhRequest,
+  updateWfhRequest,
+  deleteWfhRequest,
+  changeWfhStatus,
+  getManagerWfhRequests
 };
