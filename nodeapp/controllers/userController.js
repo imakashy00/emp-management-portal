@@ -3,7 +3,8 @@ const crypto = require('node:crypto');
 const bcrypt = require('bcrypt');
 const ManagerInvites = require('../models/managerInvites');
 const { generateToken } = require('../middlewares/auth');
-const sendManagerInvite = require('../services/sendMail');
+const { sendManagerInvite, sendPasswordResetOTP } = require('../services/sendMail');
+const PasswordReset = require('../models/passworReset');
 
 const LeaveRequest = require("../models/leaveRequestModel");
 const WfhRequest = require("../models/wfhRequestModel");
@@ -112,7 +113,17 @@ const checkEmail = async (req, res) => {
     const user = await User.findOne({ email: email.trim().toLowerCase() });
     if (!user) return res.status(404).json({ message: messages.password.emailNotFound });
 
-    return res.status(200).json({ message: messages.password.emailVerified });
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    await PasswordReset.findOneAndUpdate(
+      { email: normalizedEmail },
+      { otp, createdAt: new Date() },
+      { upsert: true, new: true }
+    );
+    await sendPasswordResetOTP(normalizedEmail, otp);
+    return res.status(200).json({ message: "OTP sent successfully to your email." });
+
+    // return res.status(200).json({ message: messages.password.emailVerified });
   } catch (error) {
     return res.status(500).json({ message: messages.common.serverError });
   }
@@ -120,12 +131,22 @@ const checkEmail = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   try {
-    const { email, newPassword } = req.body;
+    const { email, otp, newPassword } = req.body;
 
     // Validate new password length before hashing
     if (!newPassword || newPassword.length < 8) {
       return res.status(400).json({ message: modelMessages.user.password.minLength });
     }
+    // 2. Verify the OTP from the PasswordReset collection
+    const resetRecord = await PasswordReset.findOne({
+      email: normalizedEmail,
+      otp: otp
+    });
+
+    if (!resetRecord) {
+      return res.status(400).json({ message: "Invalid or expired OTP code." });
+    }
+
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     const updatedUser = await User.findOneAndUpdate(
