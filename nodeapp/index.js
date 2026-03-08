@@ -14,7 +14,7 @@ const swaggerSpec = require('./config/swagger');
 
 const app = express();
 
-const port = process.env.port || 8080;
+const port = process.env.port ;
 
 connectDB();
 

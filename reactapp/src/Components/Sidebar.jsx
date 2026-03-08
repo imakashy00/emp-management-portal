@@ -48,8 +48,8 @@ const Sidebar = ({ isOpen, isManager, onLogout, userName, role }) => {
             <div className="pt-6 space-y-1.5">
               <p className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-3">Management</p>
               <SidebarItem icon={Users} label="Employee Directory" isActive={isPathActive('/employees')} onClick={() => navigate('/employees')} />
-              <SidebarItem icon={Laptop} label="WFH Approvals" isActive={isPathActive('/manager/wfh')} onClick={() => navigate('/manager/wfh')} />
-              <SidebarItem icon={FileText} label="Leave Approvals" isActive={isPathActive('/manager/leave')} onClick={() => navigate('/manager/leave')} />
+              <SidebarItem icon={Laptop} label="WFH Requests" isActive={isPathActive('/manager/wfh')} onClick={() => navigate('/manager/wfh')} />
+              <SidebarItem icon={FileText} label="Leave Requests  " isActive={isPathActive('/manager/leave')} onClick={() => navigate('/manager/leave')} />
               <div className="pt-4 border-t border-gray-50 my-3">
                 <p className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-3">System</p>
                 <SidebarItem icon={UserPlus} label="Invite Manager" isActive={isPathActive('/invite-manager')} onClick={() => navigate('/invite-manager')} />
