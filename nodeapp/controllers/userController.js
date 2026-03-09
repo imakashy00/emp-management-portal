@@ -110,17 +110,17 @@ const checkEmail = async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ message: modelMessages.user.email.required });
 
-    const user = await User.findOne({ email: email.trim().toLowerCase() });
+    const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: messages.password.emailNotFound });
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     await PasswordReset.findOneAndUpdate(
-      { email: normalizedEmail },
+      { email: email },
       { otp, createdAt: new Date() },
       { upsert: true, new: true }
     );
-    await sendPasswordResetOTP(normalizedEmail, otp);
+    await sendPasswordResetOTP(email, otp);
     return res.status(200).json({ message: "OTP sent successfully to your email." });
 
     // return res.status(200).json({ message: messages.password.emailVerified });
@@ -151,7 +151,7 @@ const resetPassword = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     const updatedUser = await User.findOneAndUpdate(
-      { email: email.trim().toLowerCase() },
+      { email: normalizedEmail },
       { password: hashedPassword }
     );
 
