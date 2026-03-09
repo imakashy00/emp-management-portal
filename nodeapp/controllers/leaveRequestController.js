@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const User = require("../models/userModel");
 const LeaveRequest = require("../models/leaveRequestModel");
 
 // CREATE: New requests default to 'Pending'
@@ -100,3 +101,63 @@ exports.deleteLeaveRequest = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+exports.getManagerLeaveRequests = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const search = req.query.search || "";
+    const statusFilter = req.query.status || "";
+
+    let query = {};
+
+    // 1. Filter by Status
+    if (statusFilter && statusFilter !== 'All') {
+      query.status = statusFilter;
+    }
+
+    // 2. Search by Reason OR Employee Name
+    if (search) {
+      const matchingUsers = await User.find({
+        userName: { $regex: search, $options: "i" }
+      }).select("_id");
+      const userIds = matchingUsers.map(u => u._id);
+
+      query.$or = [
+        { reason: { $regex: search, $options: "i" } },
+        { employeeId: { $in: userIds } }
+      ];
+    }
+
+    const totalDocs = await LeaveRequest.countDocuments(query);
+    const requests = await LeaveRequest.find(query)
+      .populate('employeeId', 'userName email mobile') // Populate for "Show More" details
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      total: totalDocs,
+      pages: Math.ceil(totalDocs / limit),
+      data: requests
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching leave requests" });
+  }
+};
+
+// NEW: Change Status (Approve/Reject)
+exports.changeLeaveStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const leave = await LeaveRequest.findById(req.params.id);
+    if (!leave) return res.status(404).json({ message: "Request not found" });
+
+    leave.status = status;
+    await leave.save();
+    res.status(200).json({ message: `Request ${status}`, data: leave });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+

@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String, required: true, enum: ["manager", "employee"],
     default: "employee"
+  },
+  leaves: {
+    type: Number,
+    default: 25
   }
 });
 

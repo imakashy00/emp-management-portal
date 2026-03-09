@@ -79,18 +79,15 @@ export const useSignup = (token, inviteEmail, navigate) => {
         try {
             const { confirmPassword, ...submitData } = formData;
 
-            const endpoint = token ? API.VERIFY_MANAGER : API.SIGNUP;
-
             const payload = token
                 ? { ...submitData, token }
                 : submitData;
+            await axios.post(API.SIGNUP, payload);
 
-            await axios.post(endpoint, payload);
-
-            toast.success(token ? "Manager setup complete! Please login." : "Account created successfully!");
+            toast.success("Account created successfully!");
             navigate('/login');
         } catch (err) {
-            toast.error(err.response?.data?.message || "Registration failed");
+            toast.error(err.response?.data?.message);
         } finally {
             setLoading(false);
         }

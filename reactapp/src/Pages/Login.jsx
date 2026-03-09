@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { useLogin } from '../hooks/useLogin';
-import Input from './Input';
-import Button from './Button';
+import Input from '../Components/Input';
+import Button from '../Components/Button';
 
 const Login = () => {
   const navigate = useNavigate();

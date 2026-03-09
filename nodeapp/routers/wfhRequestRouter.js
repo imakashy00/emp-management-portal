@@ -5,13 +5,16 @@ const {
   viewWfhRequests, 
   updateWfhRequest, 
   deleteWfhRequest,
-  changeWfhStatus 
+  changeWfhStatus,
+  getManagerWfhRequests,
 } = require('../controllers/wfhRequestController');
 const { verifyJWT, validateRole } = require('../middlewares/auth');
 const upload = require('../middlewares/upload');
 
 // All WFH routes require authentication
 router.use(verifyJWT);
+
+router.get('/', validateRole('manager'), getManagerWfhRequests);
 
 /**
  * GET /api/wfhRequests/:employeeId

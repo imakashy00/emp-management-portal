@@ -11,7 +11,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
   // Ensure allowedRoles is compared against the lowercase role
   if (!allowedRoles.map(r => r.toLowerCase()).includes(role)) {
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return children;

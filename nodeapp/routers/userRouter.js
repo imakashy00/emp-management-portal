@@ -6,7 +6,12 @@ const {
   inviteManager,
   checkEmail,
   resetPassword,
+  getDashboardStats,
+  getMe,
+  updateProfile,
+  getEmployeeStats,
 } = require('../controllers/userController');
+const { validateRole, verifyJWT } = require('../middlewares/auth');
 
 const router = express.Router();
 
@@ -18,11 +23,17 @@ router.post('/login', getUserByEmailAndPassword);
 router.post('/check-email', checkEmail);
 router.put('/reset-password', resetPassword);
 
+//me
+router.get('/me', verifyJWT, getMe);
+router.put('/update-profile', verifyJWT, updateProfile);
+
 // Employees
-router.get('/getAllEmployees', getAllEmployees);
-router.get('/employees', getAllEmployees);
+router.get('/getAllEmployees', verifyJWT, validateRole('manager'), getAllEmployees);
 
 // Manager Invitations
-router.post('/inviteManager', inviteManager);
+router.post('/inviteManager', verifyJWT, validateRole('manager'), inviteManager);
+
+router.get('/manager-stats', verifyJWT, validateRole('manager'), getDashboardStats);
+router.get('/employee-stats', verifyJWT, validateRole('employee'), getEmployeeStats);
 
 module.exports = router;

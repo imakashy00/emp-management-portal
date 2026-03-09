@@ -1,22 +1,59 @@
-import React from 'react';
-import WelcomeCard from './NewComponents/Cards/WelcomeCard';
-import { useOutletContext } from 'react-router-dom'; // 1. Import this hook
-
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Outlet } from 'react-router-dom';
+import Sidebar from '../Components/Sidebar.jsx';
+import AppFooter from '../Components/Footer.jsx';
 
 const Home = () => {
-  const { userName, role } = useOutletContext();
+  const navigate = useNavigate();
+  const [role, setRole] = useState('');
+  const [userName, setUserName] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const userRole = localStorage.getItem('userRole');
+    const storedName = localStorage.getItem('userName');
+
+    if (!userRole) {
+      navigate('/login', { replace: true });
+    } else {
+      setRole(userRole);
+      setUserName(storedName || 'User');
+    }
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/login', { replace: true });
+  };
+
+  const isManager = role?.toLowerCase() === 'manager';
+
   return (
-    <div>
-      <div className="mb-4">
-        <h3 className="text-xl font-bold text-gray-800 tracking-tight">Welcome, {userName}!</h3>
-        <p className="text-gray-500 text-xs mt-1">
-          Manage your professional tasks and requests from here.
-        </p>
-      </div>
-      <WelcomeCard userName={userName} />
+    <div className="flex h-screen bg-[var(--bg-light)] overflow-hidden">
+      <Sidebar
+        isOpen={isMobileMenuOpen}
+        isManager={isManager}
+        userName={userName}
+        role={role}
+        onNavigate={(path) => {
+          navigate(path);
+          setIsMobileMenuOpen(false);
+        }}
+        onLogout={handleLogout}
+      />
+
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+        <div className="flex-1 overflow-y-auto p-4 md:px-10 md:py-8 custom-scrollbar">
+          {/* Outlet is where WfhForm, LeaveForm, etc., will be rendered */}
+          <div className="min-h-[calc(100vh-180px)]">
+            <Outlet context={{ userName, role }} />
+          </div>
+          <AppFooter />
+        </div>
+      </main>
     </div>
   );
-}
-
+};
 
 export default Home;

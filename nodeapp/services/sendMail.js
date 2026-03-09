@@ -6,11 +6,11 @@ const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: GMAIL_USER, 
-        pass: GMAIL_APP_PASSWORD 
+        user: GMAIL_USER,
+        pass: GMAIL_APP_PASSWORD // 16-character 
     },
-    debug: true, 
-    logger: true 
+    debug: true,
+    logger: true
 });
 
 // EXISTING FUNCTION (Kept exactly as is)
@@ -18,7 +18,7 @@ const sendManagerInvite = async (email, token) => {
     const inviteLink = `https://8081-aceeaaadefefcfccffeabf.premiumproject.examly.io/register-manager?token=${token}&email=${email}`;
     
     const mailOptions = {
-        from: `"HR Management" <${GMAIL_USER}>`,
+        from: `"HR Management" <${process.env.GMAIL_USER}>`,
         to: email,
         subject: 'Manager Registration Invitation',
         html: `
@@ -40,9 +40,7 @@ const sendManagerInvite = async (email, token) => {
     }
 };
 
-// NEW FUNCTION: For Password Reset OTP
 const sendPasswordResetOTP = async (email, otp) => {
-    console.log("emk")
     const mailOptions = {
         from: `"HR Management" <${process.env.GMAIL_USER}>`,
         to: email,
@@ -71,8 +69,4 @@ const sendPasswordResetOTP = async (email, otp) => {
     }
 };
 
-// Export both functions so they can be used individually
-module.exports = {
-    sendManagerInvite,
-    sendPasswordResetOTP
-};
+module.exports = { sendManagerInvite, sendPasswordResetOTP };

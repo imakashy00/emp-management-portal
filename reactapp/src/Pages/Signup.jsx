@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSignup } from '../hooks/useSignup';
-import Input from './Input';
-import Button from './Button';
+import Input from '../Components/Input';
+import Button from '../Components/Button';
 import { Eye, EyeOff, ShieldCheck, User } from 'lucide-react';
 
 const Signup = () => {
@@ -58,7 +58,6 @@ const Signup = () => {
               <Input
                 label="Full Name"
                 name="userName"
-                required
                 containerClass="md:col-span-2"
                 error={errors.userName}
                 value={formData.userName}
@@ -69,7 +68,6 @@ const Signup = () => {
               <Input
                 label="Email Address"
                 name="email"
-                required
                 value={formData.email} // Auto-filled from URL if manager
                 disabled={isManagerInvited} // Locked if manager
                 error={errors.email}
@@ -81,7 +79,6 @@ const Signup = () => {
                 label="Mobile Number"
                 name="mobile"
                 type="number"
-                required
                 error={errors.mobile}
                 value={formData.mobile}
                 onChange={handleInputChange}
@@ -92,7 +89,6 @@ const Signup = () => {
                 label="Password"
                 name="password"
                 type={showPassword ? "text" : "password"}
-                required
                 error={errors.password}
                 icon={showPassword ? Eye : EyeOff}
                 onIconClick={() => setShowPassword(!showPassword)}
@@ -103,7 +99,6 @@ const Signup = () => {
                 label="Confirm Password"
                 name="confirmPassword"
                 type={showConfirm ? "text" : "password"}
-                required
                 error={errors.confirmPassword}
                 icon={showConfirm ? Eye : EyeOff}
                 onIconClick={() => setShowConfirm(!showConfirm)}

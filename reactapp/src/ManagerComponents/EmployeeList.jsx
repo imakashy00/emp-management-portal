@@ -1,149 +1,175 @@
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Search, Trash2, Mail, Shield, AlertCircle, Loader2 } from 'lucide-react';
+import { Search, Shield, Loader2, ChevronLeft, ChevronRight, Mail, Phone, Inbox } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
-import API from '../apiConfig'; // Importing your custom API config
+import API from '../apiConfig';
 
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Search State
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({ totalPages: 1, totalItems: 0 });
+
+  // 1. Debounce Logic: Update debouncedSearch 500ms after user stops typing
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1); // Reset to page 1 on new search
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  // 2. Fetch Logic: Triggered by page change or debounced search change
   useEffect(() => {
     fetchEmployees();
-  }, []);
+  }, [currentPage, debouncedSearch]);
 
   const fetchEmployees = async () => {
+    const token = localStorage.getItem('token');
     try {
       setLoading(true);
-      const response = await axios.get(API.GET_EMPLOYEES);
-      // Assuming your backend returns an array of users with role 'employee'
-      setEmployees(Array.isArray(response.data) ? response.data : []);
+      const response = await axios.get(API.GET_EMPLOYEES, {
+        params: {
+          page: currentPage,
+          limit: 10,
+          userName: debouncedSearch,
+          sortBy: 'userName',
+          order: 'asc'
+        }, 
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (response.data?.success) {
+        setEmployees(response.data.data || []);
+        setPagination({
+          totalPages: response.data.pagination?.totalPages || 1,
+          totalItems: response.data.pagination?.totalItems || 0
+        });
+      }
     } catch (error) {
-      console.error("Fetch error:", error);
-      toast.error("Failed to load employee directory");
+      toast.error("Unable to load directory");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("PERMANENT ACTION: Are you sure you want to delete this employee account?")) return;
-    
-    try {
-      // Use the GET_EMPLOYEES path and append the ID for the DELETE request
-      // This ensures we stay consistent with your apiConfig.js
-      const response = await axios.delete(`${API.GET_EMPLOYEES}/${id}`);
-      
-      if (response.status === 200 || response.status === 204) {
-        toast.success("Employee removed successfully");
-        fetchEmployees(); // Refresh the list from the server
-      }
-    } catch (error) {
-      console.error("Delete error:", error);
-      toast.error("Could not delete user. Please try again.");
-    }
-  };
-
-  // REAL-TIME SEARCH LOGIC
-  const filteredEmployees = employees.filter(emp =>
-    emp.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    emp.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 py-2">
-      <Toaster position="top-right" />
+    <div className="max-w-6xl mx-auto font-sans antialiased text-gray-900">
+      <Toaster position="top-center" />
 
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+      {/* Header */}
+      <div className="flex justify-between items-end">
         <div>
-          <h2 className="text-2xl font-extrabold text-[#1C4587]">Employee Directory</h2>
-          <p className="text-gray-500 text-sm font-medium">Manage and remove employee accounts</p>
+          <h1 className="text-xl font-semibold text-gray-800 tracking-tight">Employee Directory</h1>
+          <p className="text-sm text-gray-500 mt-1">Browse and manage team member profiles</p>
         </div>
+        <div className="hidden sm:block text-right">
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Staff</p>
+          <p className="text-lg font-semibold text-blue-600">{pagination.totalItems}</p>
+        </div>
+      </div>
 
-        {/* Search Input */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+      {/* Search Bar */}
+      <div className="border-b border-gray-100 pb-8 my-3">
+        <div className="relative w-full sm:w-80">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Search by name or email..."
-            className="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3C78D8] outline-none w-full md:w-80 transition-all shadow-sm"
+            placeholder="Search by name..."
+            className="w-full pl-10 pr-4 py-2 bg-gray-50 border-transparent rounded-lg text-sm focus:bg-white focus:ring-1 focus:ring-gray-200 outline-none transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
 
-      {/* Directory Table */}
-      <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-[#f8fafc] border-b border-gray-100">
-              <tr className="text-[#1C4587] text-xs font-bold uppercase tracking-widest">
-                <th className="px-8 py-5">Employee Name</th>
-                <th className="px-8 py-5">Role</th>
-                <th className="px-8 py-5 text-right">Actions</th>
+      {/* Table Section */}
+      <div className="min-h-[400px] my-3">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="text-left border-b border-gray-100 text-gray-400 text-[11px] font-semibold uppercase tracking-widest">
+              <th className="pb-4">Employee</th>
+              <th className="pb-4">Email</th>
+              <th className="pb-4">Mobile</th>
+              <th className="pb-4 text-right">Access Role</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-50">
+            {loading ? (
+              <tr>
+                <td colSpan="4" className="py-24 text-center">
+                  <Loader2 className="animate-spin inline-block text-gray-300" size={24} />
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {loading ? (
-                <tr>
-                  <td colSpan="3" className="p-20 text-center">
-                    <div className="flex flex-col items-center gap-2 text-gray-400 font-bold">
-                      <Loader2 className="w-8 h-8 animate-spin text-[#3C78D8]" />
-                      Loading Employees...
+            ) : employees.length > 0 ? (
+              employees.map((emp) => (
+                <tr key={emp._id} className="group hover:bg-gray-50/50 transition-colors">
+                  <td className="py-5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-xs font-bold">
+                        {emp.userName?.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="text-sm font-medium text-gray-700">{emp.userName}</div>
                     </div>
                   </td>
-                </tr>
-              ) : filteredEmployees.length > 0 ? (
-                filteredEmployees.map((emp) => (
-                  <tr key={emp._id} className="hover:bg-blue-50/30 transition-colors group">
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-4">
-                        {/* Avatar */}
-                        <div className="w-11 h-11 rounded-full flex items-center justify-center font-bold text-white shadow-sm bg-gradient-to-br from-[#3C78D8] to-[#1C4587]">
-                          {emp.userName?.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <div className="font-bold text-gray-800">{emp.userName}</div>
-                          <div className="text-xs text-gray-500 flex items-center gap-1 italic">
-                            <Mail className="w-3 h-3" /> {emp.email}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-2 text-sm font-semibold text-gray-600">
-                        <Shield className="w-4 h-4 text-gray-300" />
-                        <span className="capitalize">{emp.role}</span>
-                      </div>
-                    </td>
-                    <td className="px-8 py-5 text-right">
-                      {/* Delete Action */}
-                      <button
-                        onClick={() => handleDelete(emp._id)}
-                        className="p-2.5 text-red-600 bg-red-50 border border-red-100 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm"
-                        title="Delete Employee Permanently"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                /* Empty State / No Search Results */
-                <tr>
-                  <td colSpan="3" className="p-24 text-center">
-                    <AlertCircle className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                    <p className="text-gray-400 font-bold">
-                      {searchTerm ? `No results found for "${searchTerm}"` : "No Employees Found"}
-                    </p>
+                  <td className="py-5 text-sm text-gray-500">
+                    <div className="flex items-center gap-2">
+                      <Mail size={14} className="text-gray-300" />
+                      {emp.email}
+                    </div>
+                  </td>
+                  <td className="py-5 text-sm text-gray-500">
+                    <div className="flex items-center gap-2">
+                      <Phone size={14} className="text-gray-300" />
+                      {emp.mobile || "—"}
+                    </div>
+                  </td>
+                  <td className="py-5 text-right">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase rounded-md tracking-wider">
+                      <Shield size={10} /> {emp.role}
+                    </span>
                   </td>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="py-24 text-center text-gray-400 text-sm">
+                  <Inbox className="w-10 h-10 mx-auto mb-3 opacity-20" />
+                  No employees found matching your search
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination Container */}
+      <div className="flex items-center justify-between border-t border-gray-100 pt-8">
+        <p className="text-xs text-gray-400 font-medium uppercase tracking-tighter">
+          Page {currentPage} of {pagination.totalPages}
+        </p>
+        <div className="flex gap-6">
+          <button
+            disabled={currentPage === 1 || loading}
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            className="text-gray-300 hover:text-gray-900 disabled:opacity-10 transition-all"
+          >
+            <ChevronLeft size={22} />
+          </button>
+          <button
+            disabled={currentPage >= pagination.totalPages || loading}
+            onClick={() => setCurrentPage(prev => prev + 1)}
+            className="text-gray-300 hover:text-gray-900 disabled:opacity-10 transition-all"
+          >
+            <ChevronRight size={22} />
+          </button>
         </div>
       </div>
     </div>
