@@ -1,8 +1,7 @@
 
-
-import React from 'react';
+import React, { useRef } from 'react';
 import { FileText, Calendar, AlignLeft, Loader2, Paperclip, Briefcase, Activity } from 'lucide-react';
-import { useForm } from '../hooks/useForm'; 
+import { useForm } from '../hooks/useForm';
 import { Toaster } from 'react-hot-toast';
 
 const Form = ({ type = 'WFH' }) => {
@@ -11,13 +10,13 @@ const Form = ({ type = 'WFH' }) => {
   const today = new Date().toISOString().split('T')[0];
 
   return (
-    <div className="max-w-xl mx-auto font-sans antialiased text-gray-900 pt-6 pb-20">
+    <div className="max-w-xl mx-auto font-sans antialiased text-gray-900  pb-20">
       <Toaster position="top-center" />
 
       {/* Header Section */}
       <div className="text-center space-y-2">
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-50 mb-4">
-          {isLeave ? <Activity className="text-gray-300" size={24} /> : <Briefcase className="text-gray-300" size={24} />}
+          {isLeave ? <Activity className="text-blue-300" size={24} /> : <Briefcase className="text-blue-300" size={24} />}
         </div>
         <h1 className="text-xl font-semibold text-gray-800 tracking-tight">
           {isEdit ? 'Update' : 'New'} {type} Request
@@ -27,14 +26,14 @@ const Form = ({ type = 'WFH' }) => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8" noValidate>
-        
+      <form onSubmit={handleSubmit} className="space-y-4 my-5" noValidate>
+
         {/* Date Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="space-y-1">
-            <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest ml-1">Start Date</p>
+            <p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest ml-1">Start Date</p>
             <div className="relative">
-              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+              {/* <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-300" /> */}
               <input 
                 name="startDate"
                 type="date"
@@ -48,9 +47,9 @@ const Form = ({ type = 'WFH' }) => {
           </div>
 
           <div className="space-y-1">
-            <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest ml-1">End Date</p>
+            <p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest ml-1">End Date</p>
             <div className="relative">
-              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+              {/* <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-300" /> */}
               <input 
                 name="endDate"
                 type="date"
@@ -64,13 +63,14 @@ const Form = ({ type = 'WFH' }) => {
           </div>
         </div>
 
+
         {/* Leave Category (Conditional) */}
         {isLeave && (
           <div className="space-y-1">
-            <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest ml-1">Category</p>
-            <select 
-              name="leaveType" 
-              value={formData.leaveType} 
+            <p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest ml-1">Category</p>
+            <select
+              name="leaveType"
+              value={formData.leaveType}
               onChange={handleInputChange}
               className="w-full px-4 py-3 bg-gray-50 border-transparent rounded-xl text-sm outline-none focus:bg-white focus:ring-1 focus:ring-gray-200 cursor-pointer appearance-none transition-all"
             >
@@ -84,15 +84,15 @@ const Form = ({ type = 'WFH' }) => {
 
         {/* Reason Field */}
         <div className="space-y-1">
-          <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest ml-1">Justification</p>
+          <p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest ml-1">Justification</p>
           <div className="relative">
             <AlignLeft className="absolute left-4 top-4 w-4 h-4 text-gray-300" />
-            <textarea 
-              name="reason" 
+            <textarea
+              name="reason"
               placeholder="Provide a detailed reason..."
               rows="3"
               className="w-full pl-12 pr-4 py-3 bg-gray-50 border-transparent rounded-xl text-sm focus:bg-white focus:ring-1 focus:ring-gray-200 outline-none transition-all resize-none"
-              value={formData.reason} 
+              value={formData.reason}
               onChange={handleInputChange}
             />
           </div>
@@ -102,17 +102,17 @@ const Form = ({ type = 'WFH' }) => {
         {/* File Upload (Conditional) */}
         {isLeave && (
           <div className="space-y-1">
-            <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest ml-1">Attachments (Optional)</p>
+            <p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest ml-1">Attachments (Optional)</p>
             <div className="relative group">
               <div className="flex items-center gap-3 w-full px-4 py-3 bg-gray-50 border-dashed border-2 border-gray-100 rounded-xl cursor-pointer hover:bg-gray-100/50 transition-all">
                 <Paperclip size={16} className="text-gray-400" />
                 <span className="text-xs text-gray-400 font-medium truncate">
                   {formData.file ? 'Document selected' : 'Upload supporting documentation'}
                 </span>
-                <input 
-                  name="file" 
-                  type="file" 
-                  onChange={handleInputChange} 
+                <input
+                  name="file"
+                  type="file"
+                  onChange={handleInputChange}
                   className="absolute inset-0 opacity-0 cursor-pointer"
                 />
               </div>
@@ -122,10 +122,10 @@ const Form = ({ type = 'WFH' }) => {
 
         {/* Submit Button */}
         <div className="pt-4">
-          <button 
-            type="submit" 
-            disabled={loading} 
-            className="w-full py-4 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-3 shadow-sm active:scale-[0.98] disabled:opacity-50"
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-4 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-800 transition-colors flex items-center justify-center gap-3 shadow-sm active:scale-[0.98] disabled:opacity-50"
           >
             {loading ? (
               <Loader2 className="animate-spin" size={18} />
@@ -138,7 +138,7 @@ const Form = ({ type = 'WFH' }) => {
 
         {/* Footer Info */}
         <div className="text-center">
-           <p className="text-[10px] text-gray-300 uppercase tracking-widest font-medium">Internal WorkBuddy Protocol</p>
+          <p className="text-[10px] text-gray-300 uppercase tracking-widest font-medium">Internal WorkBuddy Protocol</p>
         </div>
       </form>
     </div>

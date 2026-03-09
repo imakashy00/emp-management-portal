@@ -1,6 +1,7 @@
+
 import React from 'react';
 
-const Input = ({ label, icon: Icon, error, className = "", ...props }) => {
+const Input = ({ label, icon: Icon, onIconClick, error, className = "", ...props }) => {
   return (
     <div className="w-full group">
       {label && (
@@ -9,17 +10,21 @@ const Input = ({ label, icon: Icon, error, className = "", ...props }) => {
         </label>
       )}
       <div className="relative flex items-center">
-        {/* Only show Icon if it is NOT a date type to prevent double icons */}
-        {Icon && props.type !== 'date' && (
-          <Icon className="absolute left-0 text-gray-400 group-focus-within:text-[#1C4587] transition-colors w-4 h-4" />
-        )}
         <input
           {...props}
           className={`w-full py-2 border-b-2 outline-none transition-all text-sm font-normal text-gray-700 bg-transparent 
-            ${Icon && props.type !== 'date' ? 'pl-7' : 'pl-0'}
-            ${error ? 'border-red-500' : 'border-gray-100 focus:border-[#1C4587]'} 
-            ${className}`}
+          ${Icon && props.type !== 'date' ? 'pr-7' : 'pr-0'} 
+          ${error ? 'border-red-500' : 'border-gray-100 focus:border-[#1C4587]'} 
+          ${className}`}
         />
+
+        {Icon && props.type !== 'date' && (
+          <Icon
+            onClick={onIconClick} // Added the click handler
+            className={`absolute right-0 text-gray-400 hover:text-[#1C4587] transition-colors w-4 h-4 
+              ${onIconClick ? 'cursor-pointer' : ''}`} // Makes it look clickable
+          />
+        )}
       </div>
       {error && <p className="text-[#CC0000] text-[9px] mt-1 font-semibold italic">{error}</p>}
     </div>
