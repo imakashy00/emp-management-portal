@@ -1,12 +1,13 @@
 import React from 'react';
 import EmployeeDashboard from '../EmployeeComponents/EmployeeDashboard';
-import { useOutletContext } from 'react-router-dom'; // 1. Import this hook
+import { useNavigate, useOutletContext } from 'react-router-dom'; // 1. Import this hook
 import ManagerDashboard from '../ManagerComponents/ManagerDashboard';
 import { Plus } from 'lucide-react';
 
 
 const Dashboard = () => {
   const { userName, role } = useOutletContext();
+  const navigate = useNavigate();
   return (
     <div>
       <div className="mb-4 flex justify-between">
@@ -19,17 +20,22 @@ const Dashboard = () => {
         </div>
         {role === 'employee' &&
           <div className="flex gap-3">
-            <button className="flex items-center gap-2 bg-[#1C4587] text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition shadow-sm">
+            <button className="flex items-center gap-2 bg-[#1C4587] text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition shadow-sm" onClick={() => navigate('/apply-leave')}>
               <Plus size={18} /> Apply Leave
             </button>
-            <button className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition shadow-sm">
+            <button className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition shadow-sm" onClick={() => navigate('/apply-wfh')}>
               <Plus size={18} /> Request WFH
             </button>
           </div>
         }
       </div>
-      {role === 'employee' ? <EmployeeDashboard /> : <ManagerDashboard />}
-    </div>
+      {role === 'employee' ? (
+        <EmployeeDashboard />
+      ) : role === 'manager' ? (
+        <ManagerDashboard />
+      ) : (
+        <div>Unauthorized</div>
+      )}    </div>
   );
 }
 
