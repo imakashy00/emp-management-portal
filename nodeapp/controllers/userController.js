@@ -41,7 +41,7 @@ const getUserByEmailAndPassword = async (req, res) => {
 
 const addUser = async (req, res) => {
   try {
-    const { userName, email, password, mobile, token } = req.body;
+    let { userName, email, password, mobile,role, token } = req.body;
     const normalizedEmail = email.toLowerCase();
 
     // --- MANUAL PASSWORD VALIDATION (Crucial for Bcrypt) ---
