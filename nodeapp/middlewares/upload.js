@@ -37,6 +37,29 @@ const upload = multer({
     fileFilter: fileFilter
 });
 
+upload.handleUpload = (fieldName) => {
+    return (req, res, next) => {
+        const uploadSingle = upload.single(fieldName);
+
+        uploadSingle(req, res, (err) => {
+            if (err instanceof multer.MulterError) {
+                // Specific Multer errors (like size)
+                if (err.code === 'LIMIT_FILE_SIZE') {
+                    return res.status(400).json({
+                        message: "File is too large. Maximum size allowed is 5MB."
+                    });
+                }
+                return res.status(400).json({ message: err.message });
+            } else if (err) {
+                // Custom errors from fileFilter (like invalid type)
+                return res.status(400).json({ message: err.message });
+            }
+            // Everything went fine
+            next();
+        });
+    };
+};
+
 // --- NEW HELPER FOR INDEX.JS ---
 // This function handles the "index.js thing" (serving the files)
 upload.setupStaticServing = (app) => {

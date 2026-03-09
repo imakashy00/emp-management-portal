@@ -1,53 +1,62 @@
 
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Search, Info, Check, X, ChevronLeft, ChevronRight, Loader2, Inbox, FileText } from 'lucide-react';
-import { toast, Toaster } from 'react-hot-toast';
+import React, { useState } from 'react';
+import { Info, Check, X, Loader2, Inbox, FileText } from 'lucide-react';
+import { useTableData } from '../hooks/useTableData';
+import FilterBar from '../Components/FilterBar';
+import Pagination from '../Components/Pagination'; // 1. Import the Pagination component
 import API from '../apiConfig';
+import axios from 'axios';
+import { toast, Toaster } from 'react-hot-toast';
 
 const LeaveRequest = () => {
-  const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: requests, loading, filters, totalPages, updateFilter, refresh } =
+    useTableData(API.GET_ALL_LEAVES);
   const [selectedReq, setSelectedReq] = useState(null);
 
-  // Search & Filter State
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const renderFilePreview = (fileName) => {
+    if (!fileName) return null;
 
-  // Pagination State
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+    const fileUrl = `${API.UPLOADS}/${fileName}`;
+    const fileExtension = fileName.split('.').pop().toLowerCase();
 
-  // 1. Debounce Logic: 500ms delay
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
-      setPage(1);
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [searchTerm]);
-
-  // 2. Fetch Logic
-  useEffect(() => {
-    fetchLeaves();
-  }, [page, statusFilter, debouncedSearch]);
-
-  const fetchLeaves = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await axios.get(API.GET_ALL_LEAVES, {
-        params: { page, search: debouncedSearch, status: statusFilter, limit: 10 },
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setRequests(response.data.data || []);
-      setTotalPages(response.data.pages || 1);
-    } catch (error) {
-      toast.error("Network error: Could not load leaves");
-    } finally {
-      setLoading(false);
+    // 1. If it's an Image
+    if (['jpg', 'jpeg', 'png', 'webp'].includes(fileExtension)) {
+      return (
+        <div className="mt-4 border rounded-lg overflow-hidden bg-gray-50">
+          <p className="text-[10px] font-bold text-gray-400 uppercase p-2 border-b bg-white">Image Preview</p>
+          <img
+            src={fileUrl}
+            alt="Attachment"
+            className="w-full h-auto max-h-[300px] object-contain mx-auto"
+          />
+        </div>
+      );
     }
+    // 2. If it's a PDF
+    if (fileExtension === 'pdf') {
+      return (
+        <div className="mt-4 border rounded-lg overflow-hidden bg-gray-50">
+          <p className="text-[10px] font-bold text-gray-400 uppercase p-2 border-b bg-white">PDF Preview</p>
+          <iframe
+            src={`${fileUrl}#toolbar=0`}
+            className="w-full h-[400px]"
+            title="PDF Document"
+          ></iframe>
+        </div>
+      );
+    }
+
+    // 3. Fallback for other files
+    return (
+      <a
+        href={fileUrl}
+        target="_blank"
+        rel="noreferrer"
+        className="flex items-center gap-2 text-xs text-blue-500 font-medium pt-2 hover:underline mt-4"
+      >
+        <FileText size={14} /> Download Document ({fileExtension.toUpperCase()})
+      </a>
+    );
   };
 
   const handleStatusUpdate = async (id, status) => {
@@ -58,9 +67,9 @@ const LeaveRequest = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success(`Request ${status}`);
-      fetchLeaves();
+      refresh();
     } catch (error) {
-      toast.error("Action failed");
+      toast.error(error.response?.data?.message || "Action failed");
     }
   };
 
@@ -68,38 +77,13 @@ const LeaveRequest = () => {
     <div className="max-w-6xl mx-auto font-sans antialiased text-gray-900">
       <Toaster position="top-center" />
 
-      {/* Header */}
-      <div>
+      <div className="mb-6">
         <h1 className="text-xl font-semibold text-gray-800 tracking-tight">Leave Approvals</h1>
         <p className="text-sm text-gray-500 mt-1">Review and manage employee absence requests</p>
       </div>
 
-      {/* Control Bar */}
-      <div className="flex flex-col sm:flex-row gap-4 my-3 items-center justify-between border-b border-gray-100 pb-8">
-        <div className="relative w-full sm:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search employee..."
-            className="w-full pl-10 pr-4 py-2 bg-gray-50 border-transparent rounded-lg text-sm focus:bg-white focus:ring-1 focus:ring-gray-200 outline-none transition-all"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+      <FilterBar filters={filters} onFilterChange={updateFilter} />
 
-        <select
-          className="w-full sm:w-44 px-4 py-2 bg-gray-50 border-transparent rounded-lg text-sm outline-none focus:ring-1 focus:ring-gray-200 cursor-pointer appearance-none transition-all"
-          value={statusFilter}
-          onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-        >
-          <option value="">All Statuses</option>
-          <option value="Pending">Pending</option>
-          <option value="Approved">Approved</option>
-          <option value="Rejected">Rejected</option>
-        </select>
-      </div>
-
-      {/* Table Section */}
       <div className="min-h-[400px] my-3">
         <table className="w-full border-collapse">
           <thead>
@@ -132,20 +116,20 @@ const LeaveRequest = () => {
                   </td>
                   <td className="py-5">
                     <span className={`inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wider uppercase ${req.status === 'Approved' ? 'text-green-600 bg-green-50' :
-                        req.status === 'Rejected' ? 'text-red-600 bg-red-50' : 'text-orange-600 bg-orange-50'
+                      req.status === 'Rejected' ? 'text-red-600 bg-red-50' : 'text-orange-600 bg-orange-50'
                       }`}>{req.status}</span>
                   </td>
                   <td className="py-5 text-right">
                     <div className="flex justify-end gap-4">
-                      <button onClick={() => setSelectedReq(req)} className="text-blue-500 " title="View Details">
+                      <button onClick={() => setSelectedReq(req)} className="text-blue-500 hover:text-blue-700" title="View Details">
                         <Info size={18} />
                       </button>
                       {req.status === 'Pending' && (
                         <>
-                          <button onClick={() => handleStatusUpdate(req._id, 'Approved')} className="text-green-600 " title="Approve">
+                          <button onClick={() => handleStatusUpdate(req._id, 'Approved')} className="text-green-600 hover:text-green-800" title="Approve">
                             <Check size={18} />
                           </button>
-                          <button onClick={() => handleStatusUpdate(req._id, 'Rejected')} className="text-red-600 " title="Reject">
+                          <button onClick={() => handleStatusUpdate(req._id, 'Rejected')} className="text-red-600 hover:text-red-800" title="Reject">
                             <X size={18} />
                           </button>
                         </>
@@ -161,64 +145,75 @@ const LeaveRequest = () => {
         </table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between border-t border-gray-100 pt-8">
-        <p className="text-xs text-gray-400 font-medium uppercase tracking-tighter">Page {page} of {totalPages}</p>
-        <div className="flex gap-6">
-          <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="text-gray-300 hover:text-gray-900 disabled:opacity-10 transition-all">
-            <ChevronLeft size={22} />
-          </button>
-          <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="text-gray-300 hover:text-gray-900 disabled:opacity-10 transition-all">
-            <ChevronRight size={22} />
-          </button>
-        </div>
-      </div>
+      {/* 2. Replace manual buttons with the Pagination component */}
+      <Pagination
+        filters={filters}
+        totalPages={totalPages}
+        onPageChange={(page) => updateFilter('page', page)}
+      />
 
       {/* Detail Modal */}
       {selectedReq && (
-        <div className="fixed inset-0 bg-white/80 backdrop-blur-md z-50 flex items-center justify-center p-6">
-          <div className="bg-white border border-gray-100 shadow-2xl rounded-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="p-8 space-y-6">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          {/* Increased max-width to max-w-2xl to fit the document preview nicely */}
+          <div className="bg-white border border-gray-100 shadow-2xl rounded-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6 md:p-8 space-y-6 max-h-[90vh] overflow-y-auto">
+
+              {/* Header */}
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800">{selectedReq.employeeId?.userName}</h3>
                   <p className="text-xs text-gray-400">{selectedReq.employeeId?.email}</p>
                 </div>
-                <button onClick={() => setSelectedReq(null)} className="text-gray-300 hover:text-gray-800"><X size={20} /></button>
+                <button
+                  onClick={() => setSelectedReq(null)}
+                  className="p-1 hover:bg-gray-100 rounded-full text-gray-400 transition-colors"
+                >
+                  <X size={24} />
+                </button>
               </div>
 
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-bold text-gray-300 uppercase">Type</p>
-                    <p className="text-sm font-medium text-gray-700">{selectedReq.leaveType}</p>
+              {/* Leave Details Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pb-6 border-b border-gray-50">
+                <div className="md:col-span-1 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Type</p>
+                      <p className="text-sm font-medium text-gray-700">{selectedReq.leaveType}</p>
+                    </div>
                   </div>
+                  <div className='spacey-y-1'>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</p>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md uppercase ${selectedReq.status === 'Approved' ? 'text-green-600 bg-green-50' :
+                      selectedReq.status === 'Rejected' ? 'text-red-600 bg-red-50' : 'text-orange-600 bg-orange-50'
+                      }`}>{selectedReq.status}</span>
+                  </div>
+
                   <div className="space-y-1">
-                    <p className="text-[10px] font-bold text-gray-300 uppercase">Status</p>
-                    <p className="text-sm font-medium text-gray-700">{selectedReq.status}</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Duration</p>
+                    <p className="text-sm text-gray-700">
+                      {new Date(selectedReq.startDate).toLocaleDateString('en-GB')} — {new Date(selectedReq.endDate).toLocaleDateString('en-GB')}
+                    </p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Reason</p>
+                    <p className="text-sm text-gray-600 leading-relaxed italic">"{selectedReq.reason}"</p>
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <p className="text-[10px] font-bold text-gray-300 uppercase">Reason</p>
-                  <p className="text-sm text-gray-600 leading-relaxed">{selectedReq.reason}</p>
+                {/* Document Preview Section */}
+                <div className="md:col-span-2 bg-gray-50/50 rounded-md">
+                  {selectedReq.file ? (
+                    renderFilePreview(selectedReq.file)
+                  ) : (
+                    <div className="h-full flex flex-col items-center justify-center py-10 text-gray-300">
+                      <FileText size={40} className="opacity-20 mb-2" />
+                      <p className="text-xs font-medium">No document attached</p>
+                    </div>
+                  )}
                 </div>
-
-                {selectedReq.file && (
-                  <a
-                    href={`${API.BASE_URL}/uploads/${selectedReq.file}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-2 text-xs text-blue-500 font-medium pt-2 hover:underline"
-                  >
-                    <FileText size={14} /> Attached Document
-                  </a>
-                )}
               </div>
-
-              <button onClick={() => setSelectedReq(null)} className="w-full py-2.5 bg-gray-900 text-white rounded-lg text-sm font-medium">
-                Close
-              </button>
             </div>
           </div>
         </div>
@@ -228,3 +223,160 @@ const LeaveRequest = () => {
 };
 
 export default LeaveRequest;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import React, { useState } from 'react';
+// // ... other imports
+
+// const LeaveRequest = () => {
+//   // ... existing logic (useTableData, handleStatusUpdate)
+
+//   // Helper to determine how to render the file
+//   const renderFilePreview = (fileName) => {
+//     if (!fileName) return null;
+
+//     const fileUrl = `${API.BASE_URL}/uploads/${fileName}`;
+//     const fileExtension = fileName.split('.').pop().toLowerCase();
+
+//     // 1. If it's an Image
+//     if (['jpg', 'jpeg', 'png', 'webp'].includes(fileExtension)) {
+//       return (
+//         <div className="mt-4 border rounded-lg overflow-hidden bg-gray-50">
+//           <p className="text-[10px] font-bold text-gray-400 uppercase p-2 border-b bg-white">Image Preview</p>
+//           <img
+//             src={fileUrl}
+//             alt="Attachment"
+//             className="w-full h-auto max-h-[300px] object-contain mx-auto"
+//           />
+//         </div>
+//       );
+//     }
+
+//     // 2. If it's a PDF
+//     if (fileExtension === 'pdf') {
+//       return (
+//         <div className="mt-4 border rounded-lg overflow-hidden bg-gray-50">
+//           <p className="text-[10px] font-bold text-gray-400 uppercase p-2 border-b bg-white">PDF Preview</p>
+//           <iframe
+//             src={`${fileUrl}#toolbar=0`}
+//             className="w-full h-[400px]"
+//             title="PDF Document"
+//           ></iframe>
+//         </div>
+//       );
+//     }
+
+//     // 3. Fallback for other files
+//     return (
+//       <a
+//         href={fileUrl}
+//         target="_blank"
+//         rel="noreferrer"
+//         className="flex items-center gap-2 text-xs text-blue-500 font-medium pt-2 hover:underline mt-4"
+//       >
+//         <FileText size={14} /> Download Document ({fileExtension.toUpperCase()})
+//       </a>
+//     );
+//   };
+
+//   return (
+//     <div className="max-w-6xl mx-auto font-sans antialiased text-gray-900">
+//       {/* ... Table and Pagination code ... */}
+
+//       {/* Updated Detail Modal */}
+//       {selectedReq && (
+//         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+//           {/* Increased max-width to max-w-2xl to fit the document preview nicely */}
+//           <div className="bg-white border border-gray-100 shadow-2xl rounded-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+//             <div className="p-6 md:p-8 space-y-6 max-h-[90vh] overflow-y-auto">
+
+//               {/* Header */}
+//               <div className="flex justify-between items-start">
+//                 <div>
+//                   <h3 className="text-lg font-semibold text-gray-800">{selectedReq.employeeId?.userName}</h3>
+//                   <p className="text-xs text-gray-400">{selectedReq.employeeId?.email}</p>
+//                 </div>
+//                 <button
+//                   onClick={() => setSelectedReq(null)}
+//                   className="p-1 hover:bg-gray-100 rounded-full text-gray-400 transition-colors"
+//                 >
+//                   <X size={24} />
+//                 </button>
+//               </div>
+
+//               {/* Leave Details Grid */}
+//               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-gray-50">
+//                 <div className="space-y-4">
+//                   <div className="grid grid-cols-2 gap-4">
+//                     <div className="space-y-1">
+//                       <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Type</p>
+//                       <p className="text-sm font-medium text-gray-700">{selectedReq.leaveType}</p>
+//                     </div>
+//                     <div className="space-y-1">
+//                       <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</p>
+//                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md uppercase ${selectedReq.status === 'Approved' ? 'text-green-600 bg-green-50' :
+//                           selectedReq.status === 'Rejected' ? 'text-red-600 bg-red-50' : 'text-orange-600 bg-orange-50'
+//                         }`}>{selectedReq.status}</span>
+//                     </div>
+//                   </div>
+
+//                   <div className="space-y-1">
+//                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Duration</p>
+//                     <p className="text-sm text-gray-700">
+//                       {new Date(selectedReq.startDate).toLocaleDateString('en-GB')} — {new Date(selectedReq.endDate).toLocaleDateString('en-GB')}
+//                     </p>
+//                   </div>
+
+//                   <div className="space-y-1">
+//                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Reason</p>
+//                     <p className="text-sm text-gray-600 leading-relaxed italic">"{selectedReq.reason}"</p>
+//                   </div>
+//                 </div>
+
+//                 {/* Document Preview Section */}
+//                 <div className="bg-gray-50/50 p-2 rounded-xl">
+//                   {selectedReq.file ? (
+//                     renderFilePreview(selectedReq.file)
+//                   ) : (
+//                     <div className="h-full flex flex-col items-center justify-center py-10 text-gray-300">
+//                       <FileText size={40} className="opacity-20 mb-2" />
+//                       <p className="text-xs font-medium">No document attached</p>
+//                     </div>
+//                   )}
+//                 </div>
+//               </div>
+
+//               {/* Footer Button */}
+//               <button
+//                 onClick={() => setSelectedReq(null)}
+//                 className="w-full py-3 bg-gray-900 text-white rounded-xl text-sm font-semibold hover:bg-black transition-colors"
+//               >
+//                 Close Details
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default LeaveRequest;

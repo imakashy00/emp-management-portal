@@ -3,39 +3,32 @@ const path = require('path');
 const WfhRequest = require("../models/wfhRequestModel");
 const messages = require('../errorMessages/controllerError.json');
 const User = require('../models/userModel');
+const { buildSmartQuery } = require('../utils/queryHelper');
 
-// READ: Paginated fetch (Standardized to match Leave controller)
 const viewWfhRequests = async (req, res) => {
   try {
-    const { employeeId } = req.params;
+    const { id: employeeId } = req.user;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
-    const skip = (page - 1) * limit;
-    const search = req.query.search || "";
 
-    const query = { employeeId, reason: { $regex: search, $options: "i" } };
+    const query = await buildSmartQuery(req, null, { employeeId });
 
-    const totalDocs = await WfhRequest.countDocuments(query);
-    const requests = await WfhRequest.find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+    const [data, total] = await Promise.all([
+      WfhRequest.find(query).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit),
+      WfhRequest.countDocuments(query)
+    ]);
 
-    res.status(200).json({
-      total: totalDocs,
-      pages: Math.ceil(totalDocs / limit),
-      data: requests
-    });
+    res.status(200).json({ data, total, pages: Math.ceil(total / limit) });
   } catch (error) {
-    console.log('Error:', error)
-    res.status(500).json({ message: messages.wfh.fetchError });
+    res.status(500).json({ message: "Error fetching history" });
   }
 };
 
 // CREATE
 const addWfhRequest = async (req, res) => {
   try {
-    const { employeeId, startDate, endDate, reason } = req.body;
+    const { startDate, endDate, reason } = req.body;
+    const { id: employeeId } = req.user;
     const fileName = req.file ? req.file.filename : null;
 
     if (!employeeId) return res.status(400).json({ message: "Employee ID is required" });
@@ -120,53 +113,20 @@ const changeWfhStatus = async (req, res) => {
 const getManagerWfhRequests = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-    const search = req.query.search || "";
-    const statusFilter = req.query.status || "";
-    const sortBy = req.query.sortBy || "createdAt";
-    const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
+    const limit = parseInt(req.query.limit) || 5;
 
-    // 1. Build Query Object
-    let query = {};
+    const query = await buildSmartQuery(req, User);
 
-    // Filter by Status if provided
-    if (statusFilter) {
-      query.status = statusFilter;
-    }
+    const [data, total] = await Promise.all([
+      WfhRequest.find(query).populate('employeeId', 'userName email').sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit),
+      WfhRequest.countDocuments(query)
+    ]);
 
-    // 2. Search Logic (Reason or Employee Name)
-    if (search) {
-      // Find users whose name matches the search
-      const matchingUsers = await User.find({
-        userName: { $regex: search, $options: "i" }
-      }).select("_id");
-      const userIds = matchingUsers.map(u => u._id);
-
-      query.$or = [
-        { reason: { $regex: search, $options: "i" } },
-        { employeeId: { $in: userIds } }
-      ];
-    }
-
-    const totalDocs = await WfhRequest.countDocuments(query);
-    const requests = await WfhRequest.find(query)
-      .populate('employeeId', 'userName email') // Get employee details
-      .sort({ [sortBy]: sortOrder })
-      .skip(skip)
-      .limit(limit);
-
-    res.status(200).json({
-      total: totalDocs,
-      pages: Math.ceil(totalDocs / limit),
-      currentPage: page,
-      data: requests
-    });
+    res.status(200).json({ data, total, pages: Math.ceil(total / limit) });
   } catch (error) {
     res.status(500).json({ message: "Error fetching manager view" });
   }
 };
-
 module.exports = {
   viewWfhRequests,
   addWfhRequest,
