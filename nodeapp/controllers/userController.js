@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const ManagerInvites = require('../models/managerInvites');
 const { generateToken } = require('../middlewares/auth');
 const { sendManagerInvite, sendPasswordResetOTP } = require('../services/sendMail');
-const PasswordReset = require('../models/passworReset');
+const PasswordReset = require('../models/passwordReset');
 
 const LeaveRequest = require("../models/leaveRequestModel");
 const WfhRequest = require("../models/wfhRequestModel");
@@ -125,6 +125,7 @@ const checkEmail = async (req, res) => {
 
     // return res.status(200).json({ message: messages.password.emailVerified });
   } catch (error) {
+    console.error("CheckEmail Error:", error);
     return res.status(500).json({ message: messages.common.serverError });
   }
 };
@@ -157,9 +158,11 @@ const resetPassword = async (req, res) => {
     if (!updatedUser) {
       return res.status(404).json({ message: messages.password.emailNotFound });
     }
+    await PasswordReset.deleteOne({ _id: resetRecord._id });
 
     return res.status(200).json({ message: messages.password.resetSuccess });
   } catch (error) {
+    console.error("ResetPassword Error:", error);
     return res.status(500).json({ message: messages.common.serverError });
   }
 };
