@@ -286,7 +286,7 @@ const Profile = () => {
             <Mail size={18} className="text-gray-300" />
             <div className="flex-1">
               <p className="text-[10px] font-bold text-gray-400 uppercase">Email Address</p>
-              <p className="text-sm text-gray-500 italic">{user?.email} (Locked)</p>
+              <p className="text-sm text-gray-500 italic">{user?.email}</p>
             </div>
           </div>
 
@@ -307,14 +307,6 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* System ID & Access - Read Only */}
-          <div className="flex items-center gap-4 py-3 border-b border-gray-50">
-            <Hash size={18} className="text-gray-300" />
-            <div className="flex-1">
-              <p className="text-[10px] font-bold text-gray-400 uppercase">Employee ID</p>
-              <p className="text-sm text-gray-700">{user?._id}</p>
-            </div>
-          </div>
         </div>
 
         {/* Action Buttons */}

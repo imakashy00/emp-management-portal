@@ -1,6 +1,6 @@
 
-import React, { useRef } from 'react';
-import { FileText, Calendar, AlignLeft, Loader2, Paperclip, Briefcase, Activity } from 'lucide-react';
+import React from 'react';
+import { FileText, AlignLeft, Loader2, Paperclip, Briefcase, Activity } from 'lucide-react';
 import { useForm } from '../hooks/useForm';
 import { Toaster } from 'react-hot-toast';
 
@@ -34,7 +34,7 @@ const Form = ({ type = 'WFH' }) => {
             <p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest ml-1">Start Date</p>
             <div className="relative">
               {/* <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-300" /> */}
-              <input 
+              <input
                 name="startDate"
                 type="date"
                 min={today}
@@ -50,7 +50,7 @@ const Form = ({ type = 'WFH' }) => {
             <p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest ml-1">End Date</p>
             <div className="relative">
               {/* <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-300" /> */}
-              <input 
+              <input
                 name="endDate"
                 type="date"
                 min={formData.startDate || today}
@@ -102,12 +102,21 @@ const Form = ({ type = 'WFH' }) => {
         {/* File Upload (Conditional) */}
         {isLeave && (
           <div className="space-y-1">
-            <p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest ml-1">Attachments (Optional)</p>
+            <p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest ml-1">
+              Attachments (Optional)
+            </p>
             <div className="relative group">
               <div className="flex items-center gap-3 w-full px-4 py-3 bg-gray-50 border-dashed border-2 border-gray-100 rounded-xl cursor-pointer hover:bg-gray-100/50 transition-all">
                 <Paperclip size={16} className="text-gray-400" />
-                <span className="text-xs text-gray-400 font-medium truncate">
-                  {formData.file ? 'Document selected' : 'Upload supporting documentation'}
+                <span className="text-xs text-gray-600 font-medium truncate">
+                  {formData.file ? (
+                    // If it's a File object, show .name. If it's a string (URL), show the filename from path.
+                    typeof formData.file === 'string'
+                      ? formData.file.split('/').pop()
+                      : formData.file.name
+                  ) : (
+                    <span className="text-gray-400">Upload supporting documentation</span>
+                  )}
                 </span>
                 <input
                   name="file"
@@ -125,7 +134,7 @@ const Form = ({ type = 'WFH' }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-800 transition-colors flex items-center justify-center gap-3 shadow-sm active:scale-[0.98] disabled:opacity-50"
+            className="w-full py-4 bg-blue-500 text-white rounded-xl text-sm font-medium hover:bg-blue-800 transition-colors flex items-center justify-center gap-3 shadow-sm active:scale-[0.98] disabled:opacity-50"
           >
             {loading ? (
               <Loader2 className="animate-spin" size={18} />

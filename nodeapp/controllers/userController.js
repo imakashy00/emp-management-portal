@@ -11,6 +11,8 @@ const WfhRequest = require("../models/wfhRequestModel");
 // Import both error message files
 const messages = require('../errorMessages/controllerError.json');
 const modelMessages = require('../errorMessages/modelError.json');
+const { buildSmartQuery } = require('../utils/queryHelper');
+const { calculateDays } = require('./leaveRequestController');
 
 const getUserByEmailAndPassword = async (req, res) => {
   try {
@@ -41,7 +43,7 @@ const getUserByEmailAndPassword = async (req, res) => {
 
 const addUser = async (req, res) => {
   try {
-    let { userName, email, password, mobile,role, token } = req.body;
+    let { userName, email, password, mobile, role, token } = req.body;
     const normalizedEmail = email.toLowerCase();
 
     // --- MANUAL PASSWORD VALIDATION (Crucial for Bcrypt) ---
@@ -208,70 +210,38 @@ const inviteManager = async (req, res) => {
   }
 };
 
+
 const getAllEmployees = async (req, res) => {
   try {
-    // 1. Get query parameters with default values
-    const {
-      page = 1,
-      limit = 10,
-      userName,
-      email,
-      mobile,
-      sortBy = 'userName',
-      order = 'asc'
-    } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
 
-    // 2. Build the Search/Filter Object
-    // We start by forcing the role to 'employee' so managers/admins aren't listed
-    let query = { role: 'employee' };
+    // Use helper with UserModel = null to trigger "Scenario B" (direct search)
+    // extraQuery enforces that we only see employees
+    const query = await buildSmartQuery(req, null, { role: 'employee' });
 
-    // --- Search by userName (Partial match, case-insensitive) ---
-    if (userName) {
-      query.userName = { $regex: userName, $options: 'i' };
-    }
-
-    // --- Search by email (Partial match, case-insensitive) ---
-    if (email) {
-      query.email = { $regex: email, $options: 'i' };
-    }
-
-    // --- Search by mobile (Partial match) ---
-    if (mobile) {
-      query.mobile = { $regex: mobile, $options: 'i' };
-    }
-
-    // 3. Execute Pagination logic
-    const limitInt = parseInt(limit);
-    const pageInt = parseInt(page);
-    const skip = (pageInt - 1) * limitInt;
-
-    // 4. Fetch data and count total for frontend metadata
-    // We use Promise.all to run both queries in parallel for better performance
     const [employees, totalDocs] = await Promise.all([
       User.find(query)
-        .select('-password') // Never send passwords to frontend
-        .sort({ [sortBy]: order === 'asc' ? 1 : -1 }) // Dynamic sorting
+        .select('-password')
+        .sort({ userName: 1 })
         .skip(skip)
-        .limit(limitInt),
+        .limit(limit),
       User.countDocuments(query)
     ]);
 
-    // 5. Send Response with metadata
+    // Standardized response to match useTableData hook
     return res.status(200).json({
       success: true,
       data: employees,
-      pagination: {
-        totalItems: totalDocs,
-        totalPages: Math.ceil(totalDocs / limitInt),
-        currentPage: pageInt,
-        limit: limitInt
-      }
+      total: totalDocs,
+      pages: Math.ceil(totalDocs / limit),
+      currentPage: page
     });
 
   } catch (error) {
-    console.error('Error fetching employees:', error);
     return res.status(500).json({
-      message: messages.user?.fetchError || "Failed to fetch employee records"
+      message: "Failed to fetch employee records"
     });
   }
 };
@@ -374,22 +344,66 @@ const getDashboardStats = async (req, res) => {
 };
 
 // Example logic for an employee-specific stats endpoint
+// const getEmployeeStats = async (req, res) => {
+//   try {
+//     const {id:employeeId} = req.user;
+//     const user = await User.findById(employeeId);
+
+//     const pendingLeave = await LeaveRequest.countDocuments({ employeeId, status: 'Pending' });
+//     // console.log(pendingLeave)
+//     const pendingWfh = await WfhRequest.countDocuments({ employeeId, status: 'Pending' });
+//     // console.log(pendingWfh)
+//     const recentRequests = await LeaveRequest.find({ employeeId }).sort({ createdAt: -1 }).limit(5);
+
+//     res.status(200).json({
+//       leaveBalance: user.leaves,
+//       pendingCount: pendingLeave + pendingWfh,
+//       recentRequests
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: "Error loading dashboard" });
+//   }
+// };
+
 const getEmployeeStats = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const user = await User.findById(userId);
+    const { id: employeeId } = req.user;
+    const user = await User.findById(employeeId);
 
-    const pendingLeave = await LeaveRequest.countDocuments({ userId, status: 'Pending' });
-    const pendingWfh = await WfhRequest.countDocuments({ userId, status: 'Pending' });
-    const recentRequests = await LeaveRequest.find({ userId }).sort({ createdAt: -1 }).limit(5);
+    // 1. Define the start and end of the current month
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    // 2. Fetch all necessary data in parallel
+    const [pendingLeave, pendingWfh, approvedWfhThisMonth, recentRequests] = await Promise.all([
+      LeaveRequest.countDocuments({ employeeId, status: 'Pending' }),
+      WfhRequest.countDocuments({ employeeId, status: 'Pending' }),
+      // Fetch Approved WFH requests within this month
+      WfhRequest.find({
+        employeeId,
+        status: 'Approved',
+        startDate: { $gte: startOfMonth, $lte: endOfMonth }
+      }),
+      LeaveRequest.find({ employeeId }).sort({ createdAt: -1 }).limit(5)
+    ]);
+
+    // 3. Calculate total WFH days for the month
+    // We use the same calculateDays helper used in Leave logic
+    let wfhDaysThisMonth = 0;
+    approvedWfhThisMonth.forEach(req => {
+      wfhDaysThisMonth += calculateDays(req.startDate, req.endDate);
+    });
 
     res.status(200).json({
       leaveBalance: user.leaves,
       pendingCount: pendingLeave + pendingWfh,
+      wfhDaysThisMonth: wfhDaysThisMonth, // This is what your dashboard will use
       recentRequests
     });
   } catch (error) {
-    res.status(500).json({ message: "Error loading dashboard" });
+    console.error(error);
+    res.status(500).json({ message: "Error loading dashboard stats" });
   }
 };
 

@@ -18,12 +18,12 @@ router.get('/', validateRole('manager'), getManagerLeaveRequests);
 router.patch('/:id/status', validateRole('manager'), changeLeaveStatus);
 
 // Standardized routes
-router.post('/', upload.single('file'), addLeaveRequest);
+router.post('/', upload.handleUpload('file'), addLeaveRequest);
 
 // FIXED: Variable name must match req.params.employeeId in controller
 router.get('/:employeeId', getLeaveRequestsByUserId); 
 
-router.put('/:id', upload.single('file'), updateLeaveRequest);
+router.put('/:id', upload.handleUpload('file'), updateLeaveRequest);
 router.delete('/:id', deleteLeaveRequest);
 
 module.exports = router;

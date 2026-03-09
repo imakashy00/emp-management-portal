@@ -3,12 +3,14 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'; // Added useN
 import {
   Home, Users, Laptop, FileText, UserPlus, History, LogOut, User, FilePlus, AlertTriangle
 } from 'lucide-react';
+import AppFooter from '../Components/Footer.jsx';
+
 
 const SidebarItem = ({ icon: Icon, label, onClick, isActive }) => (
   <button
     onClick={onClick}
     className={`w-full flex items-center gap-4 px-4 py-3 rounded-md group transition-all ${isActive
-      ? 'bg-[#3C78D8] text-[#fff] shadow-md'
+      ? 'bg-blue-500 text-[#fff] shadow-md'
       : 'text-gray-500 hover:bg-[#F8FAFC] hover:text-[#1C4587]'
       }`}
   >
@@ -21,27 +23,27 @@ const Sidebar = ({ isOpen, isManager, onLogout, userName, role }) => {
   const location = useLocation();
   const navigate = useNavigate(); // Using local navigate to ensure paths are correct
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  
+
   const isPathActive = (path) => location.pathname === path;
 
   return (
     <>
       <aside className={`fixed inset-y-0 left-0 z-40 w-72 bg-[#fff] transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition-transform duration-300 ease-in-out shadow-lg flex flex-col border-r border-gray-100`}>
-        
+
         {/* Brand Section */}
         <div className="p-8 mb-2">
-          <h1 className="text-2xl font-black tracking-tighter text-[#1C4587] italic uppercase">WorkBuddy</h1>
+          <h1 className="text-2xl font-black tracking-tighter text-[#1C4587] uppercase">WorkBuddy</h1>
           <div className="w-8 h-1 bg-[#FFD966] mt-1 rounded-full"></div>
         </div>
 
         {/* Navigation Links */}
         <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto custom-scrollbar">
           {/* FIXED PATH: Navigate to /home instead of / to avoid login redirect */}
-          <SidebarItem 
-            icon={Home} 
-            label="Dashboard" 
-            isActive={isPathActive('/')} 
-            onClick={() => navigate('/')} 
+          <SidebarItem
+            icon={Home}
+            label="Dashboard"
+            isActive={isPathActive('/')}
+            onClick={() => navigate('/')}
           />
 
           {isManager ? (
@@ -73,16 +75,16 @@ const Sidebar = ({ isOpen, isManager, onLogout, userName, role }) => {
 
         {/* Footer / User & Logout */}
         <div className="mt-auto p-4 border-t border-[#EEEEEE] space-y-2 bg-gray-50/50">
-          <Link to="/profile" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all group ${isPathActive('/profile') ? 'bg-[#3C78D8] text-white shadow-md' : 'hover:bg-[#F8FAFC] text-gray-500'}`}>
+          <Link to="/profile" className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all group ${isPathActive('/profile') ? 'bg-blue-500 text-white shadow-md' : 'hover:bg-blue-50 text-gray-500 '}`}>
             <div className={`w-9 h-9 rounded-lg flex items-center justify-center shadow-sm ${isPathActive('/profile') ? 'bg-white/20' : 'bg-white'}`}>
               <User size={20} className={isPathActive('/profile') ? 'text-white' : 'text-[#1C4587]'} />
             </div>
             <div className="flex flex-col min-w-0">
-              <span className={`text-sm font-bold truncate ${isPathActive('/profile') ? 'text-white' : 'text-gray-700'}`}>{userName || 'User'}</span>
+              <span className={`text-sm font-bold truncate ${isPathActive('/profile') ? 'text-white' : 'text-gray-600'}`}>{userName || 'User'}</span>
               <span className={`text-[10px] uppercase font-bold tracking-widest ${isPathActive('/profile') ? 'text-white/70' : 'opacity-60'}`}>{role}</span>
             </div>
           </Link>
-          
+
           <button
             onClick={() => setShowLogoutModal(true)} // Open Confirmation
             className="w-full flex items-center gap-3 px-4 py-3.5 text-sm text-red-500 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all font-bold group"
@@ -91,6 +93,7 @@ const Sidebar = ({ isOpen, isManager, onLogout, userName, role }) => {
             <span>Sign Out</span>
           </button>
         </div>
+        <AppFooter />
       </aside>
 
       {/* --- LOGOUT CONFIRMATION MODAL --- */}

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
 import Sidebar from '../Components/Sidebar.jsx';
-import AppFooter from '../Components/Footer.jsx';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -49,7 +48,6 @@ const Home = () => {
           <div className="min-h-[calc(100vh-180px)]">
             <Outlet context={{ userName, role }} />
           </div>
-          <AppFooter />
         </div>
       </main>
     </div>

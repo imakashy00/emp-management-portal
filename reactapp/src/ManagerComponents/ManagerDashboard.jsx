@@ -39,10 +39,10 @@ const ManagerDashboard = () => {
     ];
 
     const cards = [
-        { label: "Total Employees", val: stats.summary.totalEmployees, icon: <Users size={20} />, col: "bg-blue-400" },
-        { label: "Pending Leaves", val: stats.summary.pendingLeaves, icon: <FileText size={20} />, col: "bg-blue-400" },
-        { label: "Pending WFH", val: stats.summary.pendingWfh, icon: <Home size={20} />, col: "bg-blue-400" },
-        { label: "Total Invited", val: stats.summary.totalInvited, icon: <Mail size={20} />, col: "bg-blue-400" },
+        { label: "Total Employees", val: stats.summary.totalEmployees, icon: <Users size={20} />, col: "bg-blue-300" },
+        { label: "Leaves Requests", val: stats.summary.pendingLeaves, icon: <FileText size={20} />, col: "bg-purple-300" },
+        { label: "Work From Home Requests", val: stats.summary.pendingWfh, icon: <Home size={20} />, col: "bg-orange-300" },
+        { label: "Total Invited", val: stats.summary.totalInvited, icon: <Mail size={20} />, col: "bg-yellow-300" },
     ];
 
     return (

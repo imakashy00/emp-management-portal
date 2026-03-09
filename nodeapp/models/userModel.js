@@ -29,12 +29,18 @@ const userSchema = new mongoose.Schema({
     minlength: [8, errorMessages.user.password.minLength]
   },
   role: {
-    type: String, required: true, enum: ["manager", "employee"],
+    type: String,
+    required: true,
+    enum: ["manager", "employee"],
     default: "employee"
   },
   leaves: {
     type: Number,
-    default: 25
+    // Set default only for employees; though technically shared, 
+    // the controller logic now prevents managers from using it.
+    default: function () {
+      return this.role === 'employee' ? 25 : 0;
+    }
   }
 });
 

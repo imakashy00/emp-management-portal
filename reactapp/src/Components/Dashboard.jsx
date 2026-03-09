@@ -20,7 +20,7 @@ const Dashboard = () => {
         </div>
         {role === 'employee' &&
           <div className="flex gap-3">
-            <button className="flex items-center gap-2 bg-[#1C4587] text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition shadow-sm" onClick={() => navigate('/apply-leave')}>
+            <button className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition shadow-sm" onClick={() => navigate('/apply-leave')}>
               <Plus size={18} /> Apply Leave
             </button>
             <button className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition shadow-sm" onClick={() => navigate('/apply-wfh')}>
