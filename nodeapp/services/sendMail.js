@@ -46,7 +46,7 @@ const sendManagerInvite = async (email, token) => {
 
 const sendPasswordResetOTP = async (email, otp) => {
     const mailOptions = {
-        from: `"HR Management" <${GMAIL_USER}>`,
+        from: `"HR Management" <${process.env.GMAIL_USER}>`,
         to: email,
         subject: 'Your Password Reset Code',
         html: `
