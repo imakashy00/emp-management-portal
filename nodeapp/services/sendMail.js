@@ -3,9 +3,6 @@ const nodemailer = require('nodemailer');
 const GMAIL_USER = process.env.GMAIL_USER;
 const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
 
-console.log(GMAIL_USER)
-console.log(GMAIL_APP_PASSWORD)
-// 1. Setup the Transport (The engine)
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -16,10 +13,10 @@ const transporter = nodemailer.createTransport({
     logger: true
 });
 
+// EXISTING FUNCTION (Kept exactly as is)
 const sendManagerInvite = async (email, token) => {
-    const inviteLink = `https://8081-ecdceceebbabefefcfccffeabf.premiumproject.examly.io/register-manager?token=${token}&email=${email}`;
-
-    // 2. Define the Message
+    const inviteLink = `https://8081-aceeaaadefefcfccffeabf.premiumproject.examly.io/register-manager?token=${token}&email=${email}`;
+    
     const mailOptions = {
         from: `"HR Management" <${process.env.GMAIL_USER}>`,
         to: email,
@@ -35,7 +32,6 @@ const sendManagerInvite = async (email, token) => {
     };
 
     try {
-        // 3. Send the Mail
         const info = await transporter.sendMail(mailOptions);
         console.log(`Invite sent to ${email}. MessageId: ${info.messageId}`);
     } catch (error) {

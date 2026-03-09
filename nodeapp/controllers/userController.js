@@ -134,13 +134,13 @@ const resetPassword = async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body;
 
-    // Validate new password length before hashing
+    // 1. Validate new password length
     if (!newPassword || newPassword.length < 8) {
       return res.status(400).json({ message: modelMessages.user.password.minLength });
     }
     // 2. Verify the OTP from the PasswordReset collection
     const resetRecord = await PasswordReset.findOne({
-      email: normalizedEmail,
+      email,
       otp: otp
     });
 
@@ -150,8 +150,10 @@ const resetPassword = async (req, res) => {
 
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // 4. Update the User's password
     const updatedUser = await User.findOneAndUpdate(
-      { email: normalizedEmail },
+      { email },
       { password: hashedPassword }
     );
 

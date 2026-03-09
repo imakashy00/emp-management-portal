@@ -38,3 +38,4 @@ const seedFirstManager = async () => {
 };
 
 seedFirstManager();
+

@@ -37,7 +37,3 @@ router.get('/manager-stats', verifyJWT, validateRole('manager'), getDashboardSta
 router.get('/employee-stats', verifyJWT, validateRole('employee'), getEmployeeStats);
 
 module.exports = router;
-
-
-
-
