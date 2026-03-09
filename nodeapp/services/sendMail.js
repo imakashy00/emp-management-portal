@@ -21,7 +21,7 @@ const sendManagerInvite = async (email, token) => {
 
     // 2. Define the Message
     const mailOptions = {
-        from: `"HR Management" <${GMAIL_USER}>`,
+        from: `"HR Management" <${process.env.GMAIL_USER}>`,
         to: email,
         subject: 'Manager Registration Invitation',
         html: `
