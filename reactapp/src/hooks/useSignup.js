@@ -32,7 +32,7 @@ export const useSignup = (token, inviteEmail, navigate) => {
             case 'mobile':
                 return value.toString().length !== 10 ? "Must be 10 digits" : "";
             case 'password':
-                return value.length < 6 ? "Min 6 characters required" : "";
+                return value.length < 8 ? "Min 8 characters required" : "";
             case 'confirmPassword':
                 return value !== dataToValidate.password ? "Passwords do not match" : "";
             default: return "";

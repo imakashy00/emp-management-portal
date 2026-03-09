@@ -56,13 +56,13 @@ const Signup = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
 
               <Input
-                label="Full Name"
+                label="Username"
                 name="userName"
                 containerClass="md:col-span-2"
                 error={errors.userName}
                 value={formData.userName}
                 onChange={handleInputChange}
-                placeholder="John Doe"
+                placeholder="username"
               />
 
               <Input
@@ -73,6 +73,7 @@ const Signup = () => {
                 error={errors.email}
                 onChange={handleInputChange}
                 className={isManagerInvited ? "bg-gray-50 text-gray-500" : ""}
+                placeholder="user@gmail.com"
               />
 
               <Input
@@ -93,6 +94,7 @@ const Signup = () => {
                 icon={showPassword ? Eye : EyeOff}
                 onIconClick={() => setShowPassword(!showPassword)}
                 onChange={handleInputChange}
+                placeholder="********"
               />
 
               <Input
@@ -103,6 +105,7 @@ const Signup = () => {
                 icon={showConfirm ? Eye : EyeOff}
                 onIconClick={() => setShowConfirm(!showConfirm)}
                 onChange={handleInputChange}
+                placeholder="********"
               />
             </div>
 
