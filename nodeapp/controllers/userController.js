@@ -12,7 +12,8 @@ const WfhRequest = require("../models/wfhRequestModel");
 const messages = require('../errorMessages/controllerError.json');
 const modelMessages = require('../errorMessages/modelError.json');
 const { buildSmartQuery } = require('../utils/queryHelper');
-const { calculateDays } = require('./leaveRequestController');
+const calculateDays = require('../utils/calculateDays');
+// const { calculateDays } = require('./leaveRequestController');
 
 const getUserByEmailAndPassword = async (req, res) => {
   try {
