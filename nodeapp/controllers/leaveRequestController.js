@@ -4,7 +4,7 @@ const User = require("../models/userModel");
 const LeaveRequest = require("../models/leaveRequestModel");
 const { buildSmartQuery } = require('../utils/queryHelper');
 
-export const calculateDays = (start, end) => {
+exports.calculateDays = (start, end) => {
   const startDate = new Date(start);
   const endDate = new Date(end);
   const diffTime = Math.abs(endDate - startDate);
