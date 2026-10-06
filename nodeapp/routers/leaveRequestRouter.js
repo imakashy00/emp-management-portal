@@ -7,10 +7,10 @@ const {
   deleteLeaveRequest,
   updateLeaveRequest,
   getManagerLeaveRequests, // Import new
-  changeLeaveStatus   
+  changeLeaveStatus
 } = require('../controllers/leaveRequestController');
-const { verifyJWT, validateRole } = require('../middlewares/auth'); 
-router.use(verifyJWT); 
+const { verifyJWT, validateRole } = require('../middlewares/auth');
+router.use(verifyJWT);
 
 router.get('/', validateRole('manager'), getManagerLeaveRequests);
 
@@ -20,8 +20,7 @@ router.patch('/:id/status', validateRole('manager'), changeLeaveStatus);
 // Standardized routes
 router.post('/', upload.handleUpload('file'), addLeaveRequest);
 
-// FIXED: Variable name must match req.params.employeeId in controller
-router.get('/:employeeId', getLeaveRequestsByUserId); 
+router.get('/:employeeId', getLeaveRequestsByUserId);
 
 router.put('/:id', upload.handleUpload('file'), updateLeaveRequest);
 router.delete('/:id', deleteLeaveRequest);

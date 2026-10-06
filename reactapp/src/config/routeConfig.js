@@ -1,6 +1,6 @@
+import Home from "../Components/Dashboard";
 import ForgotPassword from "../Components/ForgotPassword";
-import Login from "../Pages/Login";
-import Signup from "../Pages/Signup";
+import ManagerInvitation from "../Components/ManagerInvitation";
 import LeaveForm from "../EmployeeComponents/LeaveForm";
 import ViewLeave from "../EmployeeComponents/ViewLeave";
 import ViewWfh from "../EmployeeComponents/ViewWfh";
@@ -8,9 +8,9 @@ import WfhForm from "../EmployeeComponents/WfhForm";
 import EmployeeList from '../ManagerComponents/EmployeeList';
 import LeaveRequest from '../ManagerComponents/LeaveRequest';
 import WfhRequest from '../ManagerComponents/WfhRequest';
-import Home from "../Components/Dashboard";
-import ManagerInvitation from "../Components/ManagerInvitation";
+import Login from "../Pages/Login";
 import Profile from "../Pages/Profile";
+import Signup from "../Pages/Signup";
 
 export const publicRoutes = [
     { path: '/login', element: <Login /> },

@@ -15,8 +15,8 @@ const transporter = nodemailer.createTransport({
 
 // EXISTING FUNCTION (Kept exactly as is)
 const sendManagerInvite = async (email, token) => {
-    const inviteLink = `https://8081-aceeaaadefefcfccffeabf.premiumproject.examly.io/register-manager?token=${token}&email=${email}`;
-    
+    const inviteLink = `https://localhost:8081/register-manager?token=${token}&email=${email}`;
+
     const mailOptions = {
         from: `"HR Management" <${process.env.GMAIL_USER}>`,
         to: email,

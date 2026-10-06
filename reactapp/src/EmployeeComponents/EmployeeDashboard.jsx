@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import API from '../apiConfig';
-import { Calendar, Home, Clock, Loader2 } from 'lucide-react';
+import { Calendar, Clock, Home, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
+import API from '../apiConfig';
 
 const EmployeeDashboard = () => {
     const [stats, setStats] = useState(null);
@@ -54,7 +54,7 @@ const EmployeeDashboard = () => {
         </div>
     );
 
-    // This section handles different backend naming conventions (e.g. leaveBalance vs balance)
+    // handles different backend naming conventions (e.g. leaveBalance vs balance)
     const cardData = [
         { 
             label: 'Leave Balance', 

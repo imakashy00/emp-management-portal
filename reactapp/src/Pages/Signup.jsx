@@ -1,10 +1,10 @@
 
-import React, { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useSignup } from '../hooks/useSignup';
-import Input from '../Components/Input';
-import Button from '../Components/Button';
 import { Eye, EyeOff, ShieldCheck, User } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import Button from '../Components/Button';
+import Input from '../Components/Input';
+import { useSignup } from '../hooks/useSignup';
 
 const Signup = () => {
   const navigate = useNavigate();

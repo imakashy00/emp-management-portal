@@ -21,7 +21,7 @@ const seedFirstManager = async () => {
         const firstManager = new User({
             userName: 'Super Manager',
             email: 'admin@workbuddy.com',
-            mobile:'9876432101',
+            mobile: '9876432101',
             password: hashedPassword,
             role: 'manager'
         });

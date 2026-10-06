@@ -1,10 +1,9 @@
 
-import React from 'react';
-import { Shield, Mail, Phone, Loader2, Inbox } from 'lucide-react';
-import { useTableData } from '../hooks/useTableData';
-import FilterBar from '../Components/FilterBar';
+import { Inbox, Loader2, Mail, Phone, Shield } from 'lucide-react';
 import API from '../apiConfig';
+import FilterBar from '../Components/FilterBar';
 import Pagination from '../Components/Pagination'; // Suggested reusable component
+import { useTableData } from '../hooks/useTableData';
 
 const EmployeeList = () => {
   const { data: employees, loading, filters, totalPages, totalItems, updateFilter } =

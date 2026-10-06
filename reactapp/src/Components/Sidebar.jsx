@@ -1,8 +1,16 @@
-import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom'; // Added useNavigate
 import {
-  Home, Users, Laptop, FileText, UserPlus, History, LogOut, User, FilePlus, AlertTriangle
+  AlertTriangle,
+  FilePlus,
+  FileText,
+  History,
+  Home,
+  Laptop,
+  LogOut, User,
+  UserPlus,
+  Users
 } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom'; 
 import AppFooter from '../Components/Footer.jsx';
 
 
@@ -38,7 +46,7 @@ const Sidebar = ({ isOpen, isManager, onLogout, userName, role }) => {
 
         {/* Navigation Links */}
         <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto custom-scrollbar">
-          {/* FIXED PATH: Navigate to /home instead of / to avoid login redirect */}
+
           <SidebarItem
             icon={Home}
             label="Dashboard"
@@ -96,7 +104,7 @@ const Sidebar = ({ isOpen, isManager, onLogout, userName, role }) => {
         <AppFooter />
       </aside>
 
-      {/* --- LOGOUT CONFIRMATION MODAL --- */}
+      {/* --- LOGOUT confirm modal --- */}
       {showLogoutModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0F172A]/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-[2rem] p-8 max-w-sm w-full shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-200">
@@ -107,7 +115,7 @@ const Sidebar = ({ isOpen, isManager, onLogout, userName, role }) => {
               <h3 className="text-xl font-bold text-gray-800 mb-2">Sign Out?</h3>
               <p className="text-gray-500 text-sm mb-8 leading-relaxed">Are you sure you want to log out of WorkBuddy? Any unsaved changes may be lost.</p>
               <div className="flex gap-3">
-                {/* CALL THE ACTUAL ONLOGOUT PROP HERE */}
+
                 <button onClick={onLogout} className="flex-1 bg-[#E53E3E] hover:bg-red-700 text-white font-bold py-3 rounded-xl transition-all shadow-md active:scale-95">Log Out</button>
                 <button onClick={() => setShowLogoutModal(false)} className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-3 rounded-xl transition-all">Stay</button>
               </div>

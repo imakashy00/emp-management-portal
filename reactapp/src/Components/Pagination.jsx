@@ -1,8 +1,7 @@
-import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Pagination = ({ filters, totalPages, onPageChange }) => {
-    // If there is only one page, we can hide the pagination
+    // If there is only one page, we hide pagination
     if (totalPages <= 1) return null;
 
     const currentPage = filters.page || 1;

@@ -30,7 +30,7 @@ const options = {
             leaves: { type: 'number', default: 25 }
           }
         },
-        // ADDED: PasswordReset Schema based on your model
+
         PasswordReset: {
           type: 'object',
           properties: {
@@ -40,7 +40,7 @@ const options = {
             createdAt: { type: 'string', format: 'date-time' }
           }
         },
-        // ADDED: ManagerInvite Schema based on your model
+
         ManagerInvite: {
           type: 'object',
           properties: {

@@ -5,11 +5,11 @@ const fs = require('fs'); // Added File System module
 const path = require('path');
 const { addLeaveRequest, getLeaveRequestsByUserId, deleteLeaveRequest, updateLeaveRequest } = require('../controllers/userController');
 
-// --- NEW LOGIC: AUTO-CREATE UPLOADS FOLDER ---
+// --- auto create uploads folders ---
 const uploadDir = 'uploads';
 if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
-    console.log("✅ Created 'uploads' directory automatically.");
+  fs.mkdirSync(uploadDir);
+  console.log("✅ Created 'uploads' directory automatically.");
 }
 
 // Storage Configuration

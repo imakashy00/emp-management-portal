@@ -1,13 +1,13 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Edit3, Trash2, Lock, Plus, Loader2, AlertTriangle } from 'lucide-react'; // Added AlertTriangle
-import { useTableData } from '../hooks/useTableData';
-import FilterBar from '../Components/FilterBar';
-import API from '../apiConfig';
 import axios from 'axios';
-import { toast, Toaster } from 'react-hot-toast'; // Ensure Toaster is included
+import { AlertTriangle, Edit3, Loader2, Lock, Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { toast, Toaster } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import FilterBar from '../Components/FilterBar';
 import Pagination from '../Components/Pagination';
+import API from '../apiConfig';
+import { useTableData } from '../hooks/useTableData';
 
 const ViewLeave = () => {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ const ViewLeave = () => {
   const { data: requests, loading, filters, totalPages, updateFilter, refresh } =
     useTableData(`${API.GET_LEAVE_BY_USER}/${userId}`, { limit: 5 });
   const [deleteId, setDeleteId] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false); // Added loading state for delete button
+  const [isDeleting, setIsDeleting] = useState(false); 
 
   const confirmDelete = async () => {
     try {
@@ -95,7 +95,7 @@ const ViewLeave = () => {
         onPageChange={(newPage) => updateFilter('page', newPage)}
       />
 
-      {/* DELETE CONFIRMATION MODAL */}
+      {/* DELETE confirm modal */}
       {deleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm p-4">
           <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-2xl max-w-xs w-full text-center space-y-6 animate-in zoom-in duration-200">

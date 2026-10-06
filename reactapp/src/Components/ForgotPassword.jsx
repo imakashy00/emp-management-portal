@@ -1,10 +1,10 @@
 
-import React, { useState } from 'react';
+import { Eye, EyeOff, Mail, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, ShieldCheck, Mail, Lock } from 'lucide-react';
 import { useForgotPassword } from '../hooks/useForgotPassword';
-import Input from './Input';
 import Button from './Button';
+import Input from './Input';
 
 const ForgotPassword = () => {
   const navigate = useNavigate();

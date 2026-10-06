@@ -1,13 +1,13 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Edit3, Trash2, Plus, Lock, Loader2, AlertTriangle } from 'lucide-react';
-import { useTableData } from '../hooks/useTableData';
-import FilterBar from '../Components/FilterBar';
-import API from '../apiConfig';
 import axios from 'axios';
+import { AlertTriangle, Edit3, Loader2, Lock, Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import FilterBar from '../Components/FilterBar';
 import Pagination from '../Components/Pagination';
+import API from '../apiConfig';
+import { useTableData } from '../hooks/useTableData';
 
 const ViewWfh = () => {
   const navigate = useNavigate();
@@ -101,7 +101,7 @@ const ViewWfh = () => {
         onPageChange={(newPage) => updateFilter('page', newPage)}
       />
 
-      {/* DELETE CONFIRMATION MODAL */}
+      {/* DELETE confirm modal */}
       {deleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm p-4">
           <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-2xl max-w-xs w-full text-center space-y-6 animate-in zoom-in duration-200">

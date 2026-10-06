@@ -1,4 +1,3 @@
-import React from 'react';
 
 const Footer = () => (
   <footer className=" text-gray-400 p-2 text-center shadow-inner">

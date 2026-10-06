@@ -1,13 +1,13 @@
 
-import { useState } from 'react';
 import axios from 'axios';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 import API from '../apiConfig';
 
 export const useForgotPassword = (navigate) => {
     const [formData, setFormData] = useState({
         email: '',
-        otp: '', // Added OTP
+        otp: '',
         newPassword: '',
         confirmPassword: ''
     });
@@ -30,7 +30,7 @@ export const useForgotPassword = (navigate) => {
             await axios.post(API.CHECK_EMAIL, { email: processedEmail });
             toast.info("OTP sent! Please check your email.");
             setLoading(false);
-            return true; // Return success to move to next step
+            return true;
         } catch (err) {
             toast.error(err.response?.data?.message || "Email not found");
             setLoading(false);

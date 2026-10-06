@@ -1,5 +1,5 @@
 
-import React from 'react';
+// import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const ErrorPage = () => {
@@ -18,7 +18,7 @@ const ErrorPage = () => {
 
       <div className="bg-white p-10 rounded-xl shadow-lg border border-[var(--border-color)] flex flex-col items-center max-w-md w-full">
 
-        {/* Title using your --danger color */}
+        {/* Title using  --danger color */}
         <h1 className="text-2xl sm:text-3xl font-bold text-[var(--danger)] text-center mb-3">
           Oops! Something Went Wrong
         </h1>

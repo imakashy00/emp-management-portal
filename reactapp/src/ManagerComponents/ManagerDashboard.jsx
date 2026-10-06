@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Users, FileText, Home, Mail, Loader2, ShieldCheck } from 'lucide-react';
-import API from '../apiConfig';
+import { FileText, Home, Loader2, Mail, ShieldCheck, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import API from '../apiConfig';
 
 const ManagerDashboard = () => {
     const [stats, setStats] = useState(null);

@@ -1,23 +1,21 @@
-import React from 'react';
-import { render, fireEvent, screen } from '@testing-library/react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import store from '../store';
-import Login from '../Components/Login';
 import '@testing-library/jest-dom/extend-expect';
-import axios from 'axios';
-import Signup from '../Components/Signup';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { Provider } from 'react-redux';
+import { BrowserRouter as Router } from 'react-router-dom';
 import ErrorPage from '../Components/ErrorPage';
 import HomePage from '../Components/HomePage';
+import Login from '../Components/Login';
+import Signup from '../Components/Signup';
 import EmployeeNavbar from '../EmployeeComponents/EmployeeNavbar';
-import LeaveForm from "../EmployeeComponents/LeaveForm"
+import LeaveForm from "../EmployeeComponents/LeaveForm";
 import ViewLeave from '../EmployeeComponents/ViewLeave';
 import ViewWfh from '../EmployeeComponents/ViewWfh';
-import WfhForm from "../EmployeeComponents/WfhForm"
-import ManagerNavbar from '../ManagerComponents/ManagerNavbar';
+import WfhForm from "../EmployeeComponents/WfhForm";
 import LeaveRequest from '../ManagerComponents/LeaveRequest';
+import ManagerNavbar from '../ManagerComponents/ManagerNavbar';
 import WfhRequest from '../ManagerComponents/WfhRequest';
+import store from '../store';
 
 jest.mock('axios');
 
@@ -41,11 +39,11 @@ describe('Login Component', () => {
     );
   };
 
-  
+
   test('frontend_login_component_renders_the_with_login_heading', () => {
     renderLoginComponent();
 
-  
+
     const loginHeadings = screen.getAllByText(/Login/i);
     expect(loginHeadings.length).toBeGreaterThan(0);
 
@@ -61,7 +59,7 @@ describe('Login Component', () => {
     expect(screen.getByText('Password is required')).toBeInTheDocument();
   });
 
-   
+
 });
 describe('Signup Component', () => {
   afterEach(() => {
@@ -83,7 +81,7 @@ describe('Signup Component', () => {
     renderSignupComponent();
 
     const signupHeadings = screen.getAllByText(/Signup/i);
-   expect(signupHeadings.length).toBeGreaterThan(0);
+    expect(signupHeadings.length).toBeGreaterThan(0);
 
   });
 
@@ -197,7 +195,7 @@ describe('EmployeeNavbar Component', () => {
 
   test('frontend_employee_navbar_component_renders_with_logout', () => {
     renderEmployeeNavbarComponent();
-  
+
     const logout = screen.getAllByText('Logout');
     expect(logout.length).toBeGreaterThan(0);
   });
@@ -242,7 +240,7 @@ describe('LeaveForm Component', () => {
 
   test('frontend_leave_form_component_renders_with_logout', () => {
     renderLeaveFormComponent();
-  
+
     const logout = screen.getAllByText('Logout');
     expect(logout.length).toBeGreaterThan(0);
   });
@@ -270,15 +268,15 @@ describe('ViewLeave Component', () => {
 
     const tableElement = screen.getByRole('table');
     expect(tableElement).toBeInTheDocument();
- });
+  });
 
- 
- test('frontend_view_leave_component_renders_with_logout', () => {
-  renderViewLeaveComponent();
 
-  const logout = screen.getAllByText('Logout');
-  expect(logout.length).toBeGreaterThan(0);
-});
+  test('frontend_view_leave_component_renders_with_logout', () => {
+    renderViewLeaveComponent();
+
+    const logout = screen.getAllByText('Logout');
+    expect(logout.length).toBeGreaterThan(0);
+  });
 
   test('frontend_view_leave_component_renders_with_heading', () => {
     renderViewLeaveComponent();
@@ -310,15 +308,15 @@ describe('ViewWFH Component', () => {
 
     const tableElement = screen.getByRole('table');
     expect(tableElement).toBeInTheDocument();
- });
+  });
 
- 
- test('frontend_view_wfh_component_renders_with_logout', () => {
-  renderViewWfhComponent();
 
-  const logout = screen.getAllByText('Logout');
-  expect(logout.length).toBeGreaterThan(0);
-});
+  test('frontend_view_wfh_component_renders_with_logout', () => {
+    renderViewWfhComponent();
+
+    const logout = screen.getAllByText('Logout');
+    expect(logout.length).toBeGreaterThan(0);
+  });
 
   test('frontend_view_wfh_component_renders_with_heading', () => {
     renderViewWfhComponent();
@@ -366,7 +364,7 @@ describe('WfhForm Component', () => {
 
   test('frontend_wfh_form_component_renders_with_logout', () => {
     renderWfhFormComponent();
-  
+
     const logout = screen.getAllByText('Logout');
     expect(logout.length).toBeGreaterThan(0);
   });
@@ -403,7 +401,7 @@ describe('ManagerNavbar Component', () => {
 
   test('frontend_manager_navbar_component_renders_with_logout', () => {
     renderManagerNavbarComponent();
-  
+
     const logout = screen.getAllByText('Logout');
     expect(logout.length).toBeGreaterThan(0);
   });
@@ -431,15 +429,15 @@ describe('LeaveRequest Component', () => {
 
     const tableElement = screen.getByRole('table');
     expect(tableElement).toBeInTheDocument();
- });
+  });
 
- 
- test('frontend_leave_request_component_renders_with_logout', () => {
-  renderLeaveRequestComponent();
 
-  const logout = screen.getAllByText('Logout');
-  expect(logout.length).toBeGreaterThan(0);
-});
+  test('frontend_leave_request_component_renders_with_logout', () => {
+    renderLeaveRequestComponent();
+
+    const logout = screen.getAllByText('Logout');
+    expect(logout.length).toBeGreaterThan(0);
+  });
 
   test('frontend_leave_request_component_renders_with_heading', () => {
     renderLeaveRequestComponent();
@@ -471,15 +469,15 @@ describe('WfhRequest Component', () => {
 
     const tableElement = screen.getByRole('table');
     expect(tableElement).toBeInTheDocument();
- });
+  });
 
- 
- test('frontend_wfh_request_component_renders_with_logout', () => {
-  renderWfhRequestComponent();
 
-  const logout = screen.getAllByText('Logout');
-  expect(logout.length).toBeGreaterThan(0);
-});
+  test('frontend_wfh_request_component_renders_with_logout', () => {
+    renderWfhRequestComponent();
+
+    const logout = screen.getAllByText('Logout');
+    expect(logout.length).toBeGreaterThan(0);
+  });
 
   test('frontend_wfh_request_component_renders_with_heading', () => {
     renderWfhRequestComponent();

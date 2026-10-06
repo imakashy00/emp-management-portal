@@ -12,12 +12,12 @@ const passwordResetSchema = new mongoose.Schema({
         required: true
     },
     token: {
-        type: String 
+        type: String
     },
     createdAt: {
         type: Date,
         default: Date.now,
-        expires: 600 
+        expires: 600
     }
 });
 

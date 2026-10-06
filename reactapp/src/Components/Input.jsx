@@ -1,6 +1,4 @@
 
-import React from 'react';
-
 const Input = ({ label, icon: Icon, onIconClick, error, className = "", ...props }) => {
   return (
     <div className="w-full group">

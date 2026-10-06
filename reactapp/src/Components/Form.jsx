@@ -1,8 +1,7 @@
 
-import React from 'react';
-import { FileText, AlignLeft, Loader2, Paperclip, Briefcase, Activity } from 'lucide-react';
-import { useForm } from '../hooks/useForm';
+import { Activity, AlignLeft, Briefcase, FileText, Loader2, Paperclip } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
+import { useForm } from '../hooks/useForm';
 
 const Form = ({ type = 'WFH' }) => {
   const { formData, loading, errors, handleInputChange, handleSubmit, isEdit } = useForm(type);

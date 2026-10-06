@@ -121,7 +121,7 @@ describe('LeaveRequest_Model_Test', () => {
 
   test('backend_leaverequestmodel_should_throw_error_if_startdate_is_missing', async () => {
     const invalidLeaveRequestData = {
-      userId:new  mongoose.Types.ObjectId(),
+      userId: new mongoose.Types.ObjectId(),
       endDate: new Date(),
       reason: 'Vacation',
       leaveType: 'Annual',
@@ -179,7 +179,7 @@ describe('WfhRequest_Model_Test', () => {
 });
 describe('getLeaveRequestById_Test', () => {
   test('backend_getleaverequestbyid_in_leaverequestcontroller_should_return_200_status_code_when_leave_request_found', async () => {
-    const leaveRequestId = new mongoose.Types.ObjectId(); 
+    const leaveRequestId = new mongoose.Types.ObjectId();
     const req = { params: { id: leaveRequestId } };
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -194,7 +194,7 @@ describe('getLeaveRequestById_Test', () => {
   });
 
   test('backend_getleaverequestbyid_in_leaverequestcontroller_should_return_404_status_code_when_leave_request_not_found', async () => {
-    const leaveRequestId = new mongoose.Types.ObjectId(); 
+    const leaveRequestId = new mongoose.Types.ObjectId();
     const req = { params: { id: leaveRequestId } };
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -209,7 +209,7 @@ describe('getLeaveRequestById_Test', () => {
   });
 
   test('backend_getleaverequestbyid_in_leaverequestcontroller_should_return_500_status_code_when_internal_server_error_occurs', async () => {
-    const leaveRequestId = new mongoose.Types.ObjectId(); 
+    const leaveRequestId = new mongoose.Types.ObjectId();
     const req = { params: { id: leaveRequestId } };
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -228,15 +228,17 @@ describe('getLeaveRequestById_Test', () => {
 });
 describe('addLeaveRequest_Test', () => {
   test('backend_addleaverequest_in_leaverequestcontroller_should_return_200_status_code_when_leave_request_added_successfully', async () => {
-    const req = { body: {   
-      userId: new mongoose.Types.ObjectId(),
-      startDate: new Date(),
-      endDate: new Date(),
-      reason: 'Vacation',
-      leaveType: 'Annual',
-      status: 'Pending',
-      file: 'document.pdf'
-    } };
+    const req = {
+      body: {
+        userId: new mongoose.Types.ObjectId(),
+        startDate: new Date(),
+        endDate: new Date(),
+        reason: 'Vacation',
+        leaveType: 'Annual',
+        status: 'Pending',
+        file: 'document.pdf'
+      }
+    };
     const res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn()
@@ -267,9 +269,9 @@ describe('addLeaveRequest_Test', () => {
 describe('updateLeaveRequest_Test', () => {
   test('backend_updateleaverequest_in_leaverequestcontroller_should_return_200_status_code_when_leave_request_updated_successfully', async () => {
     const leaveRequestId = new mongoose.Types.ObjectId();
-    const req = { 
+    const req = {
       params: { id: leaveRequestId },
-      body: {   
+      body: {
         userId: new mongoose.Types.ObjectId(),
         startDate: new Date(),
         endDate: new Date(),
@@ -328,7 +330,7 @@ describe('updateLeaveRequest_Test', () => {
 });
 describe('getWfhRequestById_Test', () => {
   test('backend_getwfhrequestbyid_in_wfhrequestcontroller_should_return_200_status_code_when_wfh_request_found', async () => {
-    const wfhRequestId = new mongoose.Types.ObjectId(); 
+    const wfhRequestId = new mongoose.Types.ObjectId();
     const req = { params: { id: wfhRequestId } };
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -343,7 +345,7 @@ describe('getWfhRequestById_Test', () => {
   });
 
   test('backend_getwfhrequestbyid_in_wfhrequestcontroller_should_return_404_status_code_when_wfh_request_not_found', async () => {
-    const wfhRequestId = new mongoose.Types.ObjectId(); 
+    const wfhRequestId = new mongoose.Types.ObjectId();
     const req = { params: { id: wfhRequestId } };
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -358,7 +360,7 @@ describe('getWfhRequestById_Test', () => {
   });
 
   test('backend_getwfhrequestbyid_in_wfhrequestcontroller_should_return_500_status_code_when_internal_server_error_occurs', async () => {
-    const wfhRequestId = new mongoose.Types.ObjectId(); 
+    const wfhRequestId = new mongoose.Types.ObjectId();
     const req = { params: { id: wfhRequestId } };
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -377,13 +379,15 @@ describe('getWfhRequestById_Test', () => {
 });
 describe('addWfhRequest_Test', () => {
   test('backend_addwfhrequest_in_wfhrequestcontroller_should_return_200_status_code_when_WFH_request_added_successfully', async () => {
-    const req = { body: {   
-      userId: new mongoose.Types.ObjectId(),
-      startDate: new Date(),
-      endDate: new Date(),
-      reason: 'WFH Reason',
-      status: 'Pending'
-    } };
+    const req = {
+      body: {
+        userId: new mongoose.Types.ObjectId(),
+        startDate: new Date(),
+        endDate: new Date(),
+        reason: 'WFH Reason',
+        status: 'Pending'
+      }
+    };
     const res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn()
@@ -415,9 +419,9 @@ describe('addWfhRequest_Test', () => {
 describe('updateWfhRequest_Test', () => {
   test('backend_updatewfhrequest_in_wfhrequestcontroller_should_return_200_status_code_when_wfh_request_updated_successfully', async () => {
     const wfhRequestId = new mongoose.Types.ObjectId();
-    const req = { 
+    const req = {
       params: { id: wfhRequestId },
-      body: {   
+      body: {
         userId: new mongoose.Types.ObjectId(),
         startDate: new Date(),
         endDate: new Date(),
@@ -474,11 +478,11 @@ describe('updateWfhRequest_Test', () => {
 });
 describe('getUserByEmailAndPassword_Test', () => {
   test('backend_getuserbyemailandpassword_in_usercontroller_should_return_200_status_code_when_user_found', async () => {
-    const req = { 
-      body: {   
+    const req = {
+      body: {
         email: 'test@example.com',
         password: 'password123'
-      } 
+      }
     };
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -502,11 +506,11 @@ describe('getUserByEmailAndPassword_Test', () => {
     });
   });
   test('backend_getuserbyemailandpassword_in_usercontroller_should_return_404_status_code_when_user_not_found', async () => {
-    const req = { 
-      body: {   
+    const req = {
+      body: {
         email: 'nonexistent@example.com',
         password: 'password123'
-      } 
+      }
     };
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -521,11 +525,11 @@ describe('getUserByEmailAndPassword_Test', () => {
   });
 
   test('backend_getuserbyemailandpassword_in_usercontroller_should_return_500_status_code_when_internal_server_error_occurs', async () => {
-    const req = { 
-      body: {   
+    const req = {
+      body: {
         email: 'test@example.com',
         password: 'password123'
-      } 
+      }
     };
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -541,14 +545,14 @@ describe('getUserByEmailAndPassword_Test', () => {
 });
 describe('addUser_Test', () => {
   test('backend_add_user_in_usercontroller_should_return_200_status_code_when_user_added_successfully', async () => {
-    const req = { 
-      body: {   
+    const req = {
+      body: {
         userName: 'NewUser',
         email: 'newuser@example.com',
         password: 'password123',
         role: 'user',
-        mobile:'9876543212'
-      } 
+        mobile: '9876543212'
+      }
     };
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -562,14 +566,14 @@ describe('addUser_Test', () => {
   });
 
   test('backend_add_user_in_usercontroller_should_return_500_status_code_when_internal_server_error_occurs', async () => {
-    const req = { 
-      body: {   
+    const req = {
+      body: {
         userName: 'NewUser',
         email: 'newuser@example.com',
         password: 'password123',
         role: 'user',
-        mobile:'9876544321'
-      } 
+        mobile: '9876544321'
+      }
     };
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -582,39 +586,39 @@ describe('addUser_Test', () => {
     expect(res.status).toHaveBeenCalledWith(500);
   });
 });
-  describe('validateToken', () => {
- 
-    test('backend_validatetoken_function_in_authutils_should_respond_with_400_status_for_invalidtoken', () => {
-      // Mock the req, res, and next objects
-      const req = {
-        header: jest.fn().mockReturnValue('invalidToken'),
-      };
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
-      const next = jest.fn();
-  
-      // Call the validateToken function
-      validateToken(req, res, next);
+describe('validateToken', () => {
 
-      // Assertions
-      expect(res.status).toHaveBeenCalledWith(400);
-    });
+  test('backend_validatetoken_function_in_authutils_should_respond_with_400_status_for_invalidtoken', () => {
+    // Mock the req, res, and next objects
+    const req = {
+      header: jest.fn().mockReturnValue('invalidToken'),
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+    const next = jest.fn();
 
-    test('backend_validatetoken_function_in_authutils_should_respond_with_400_status_for_no_token', () => {
-      // Mock the req, res, and next objects
-      const req = {
-        header: jest.fn().mockReturnValue(null),
-      };
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
-      const next = jest.fn();
-  
-      // Call the validateToken function
-      validateToken(req, res, next);
-      expect(res.status).toHaveBeenCalledWith(400);
-    });
+    // Call the validateToken function
+    validateToken(req, res, next);
+
+    // Assertions
+    expect(res.status).toHaveBeenCalledWith(400);
   });
+
+  test('backend_validatetoken_function_in_authutils_should_respond_with_400_status_for_no_token', () => {
+    // Mock the req, res, and next objects
+    const req = {
+      header: jest.fn().mockReturnValue(null),
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+    const next = jest.fn();
+
+    // Call the validateToken function
+    validateToken(req, res, next);
+    expect(res.status).toHaveBeenCalledWith(400);
+  });
+});

@@ -1,9 +1,8 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { publicRoutes, protectedRoutes } from './config/routeConfig.js';
+import { protectedRoutes, publicRoutes } from './config/routeConfig.js';
 import Dashboard from "./Pages/Home.jsx";
 import ProtectedRoute from './routing/ProtectedRoutes.jsx';
 

@@ -1,9 +1,9 @@
 
-import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import API from '../apiConfig';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { useLocation, useNavigate } from 'react-router-dom';
+import API from '../apiConfig';
 
 export const useForm = (type) => {
   const location = useLocation();
@@ -17,7 +17,7 @@ export const useForm = (type) => {
     endDate: '',
     reason: '',
     leaveType: 'Sick Leave',
-    file: null // This will hold either a File Object (new) or a String (existing filename)
+    file: null 
   });
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export const useForm = (type) => {
         endDate: formatDate(editData.endDate),
         reason: editData.reason,
         leaveType: editData.leaveType || 'Sick Leave',
-        file: editData.file || null // Bring existing filename into the form
+        file: editData.file || null 
       });
     }
   }, [editData]);

@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
 import axios from 'axios';
-import { Mail, Send, Loader2, ShieldCheck } from 'lucide-react';
+import { Loader2, Mail, Send, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
 import API from '../apiConfig';
 

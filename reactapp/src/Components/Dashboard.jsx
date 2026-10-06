@@ -1,8 +1,7 @@
-import React from 'react';
-import EmployeeDashboard from '../EmployeeComponents/EmployeeDashboard';
-import { useNavigate, useOutletContext } from 'react-router-dom'; // 1. Import this hook
-import ManagerDashboard from '../ManagerComponents/ManagerDashboard';
 import { Plus } from 'lucide-react';
+import { useNavigate, useOutletContext } from 'react-router-dom'; // 1. Import this hook
+import EmployeeDashboard from '../EmployeeComponents/EmployeeDashboard';
+import ManagerDashboard from '../ManagerComponents/ManagerDashboard';
 
 
 const Dashboard = () => {
