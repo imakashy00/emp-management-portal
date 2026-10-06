@@ -138,3 +138,4 @@ nodejest/tests
 reactapp/src/apiConfig.js
 nodeapp/config/cors.js
 nodeapp/uploads/
+.github
